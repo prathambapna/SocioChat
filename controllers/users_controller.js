@@ -34,10 +34,10 @@ module.exports.update= async function(req,res){
                 user.name=req.body.name;
                 user.email=req.body.email;
                 if(req.file){
-                    // //if user already has a file before then delete the previous one and save the new one, making storage efficient
-                    // if(user.avatar){
-                    //     fs.unlinkSync(path.join(__dirname,'..',user.avatar));
-                    // }
+                    //if user already has a file before then delete the previous one and save the new one, making storage efficient
+                    if(user.avatar){
+                        fs.unlinkSync(path.join(__dirname,'..',user.avatar));
+                    }
                     //this is saving the path of the uploaded file into the avatar field in the user
                     user.avatar=User.avatarPath+'/'+req.file.filename;
                 }

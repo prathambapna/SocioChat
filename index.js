@@ -1,7 +1,7 @@
 const express=require('express');
 const cookieParser=require('cookie-parser');
 const app=express();
-const port=8000;
+const port=8100;
 const expressLayouts=require('express-ejs-layouts');
 const db=require('./config/mongoose');
 
@@ -57,7 +57,7 @@ app.set('views','./views')
 //after setting the views,use session as middleware 
 //mongo store is udes to store the session cookie in db
 app.use(session({
-    name:'codeial',
+    name:'goSocial',
     //todo the secret before deployment in production mode
     secret:'blahsomething',
     saveUninitialized:false,
