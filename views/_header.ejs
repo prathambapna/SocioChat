@@ -1,0 +1,26 @@
+<header>
+    <div id="logo">
+        <p><span class="symb">&lt</span>CODEIAL<span class="symb">/&gt</span></p>
+    </div>
+    <div id="auth">
+        <ul>
+            <% if (locals.user) {%>
+                <li>
+                    <a href="/users/profile/<%=user.id%>">
+                        PROFILE
+                    </a>
+                </li>
+                <li>
+                    <a href="/users/sign-out">SIGN OUT</a>
+                </li>
+            <%}else{%>
+                <li>
+                    <a href="/users/sign-in">Sign In</a>
+                </li>
+                <li>
+                    <a href="/users/sign-up">Sign Up</a>
+                </li>
+            <% } %>
+        </ul>
+    </div>
+</header>

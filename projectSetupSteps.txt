@@ -1,0 +1,2414 @@
+Steps done
+
+1)npm init
+2)setup folders->models,views,routes,controllers,config
+3)npm install express(after this can check in package-json)
+4)in index.js
+
+//using express to create server (instead of https)
+const express=require('express');
+const app=express();
+const port=8000;
+
+app.listen(port,function(error){
+    if(error)
+    {
+        // console.log('Error:',error);
+        // or
+        console.log(`Error: $(error)`);
+    }
+    console.log(`Server is running on the port: ${port}`);
+})
+
+5)instead of nodemon index.js in terminal we can use
+go in package json
+under scripts add new tag "start":"nodemon index.js",
+now instead of nodemon index.js use npm start
+
+6)initialising git in terminal
+git init
+make new file .gitignore
+in this write the name of folders file u dont want git to take(maybe bcoz they consume lot space which is not required)
+we will write node_modules/
+u can check with git status before and after that now node_modules folder is there or not
+
+then finally git add .
+git commit -m "first commit:...."
+
+
+/*
+Why should I use express.Router() over app.get,app.post?
+organizing routes into separate files, thus promoting modularity
+building router specific middleware
+It's mostly about code organization / maintainability and scoping middleware.
+If all you have are ten routes, you're fine without it, especially if they all need the same middleware. 
+At that size it's personal preference, there's no performance advantage or the like.
+Once you start having 3-4 or more resources (models) and need routes for each to create,read, update and delete, 
+or if some are authenticated and others are not, etc, you start appreciating the organization more.
+*/
+
+7)make index.js in route
+inside route/index.js
+
+const express=require('express');
+const router=express.Router();
+
+//here we r not doing app=express();
+
+module.exports=router;
+
+8)in index.js
+//use express router(use before server starts  as middleware)
+app.use('/',require('./routes'));
+
+9)in home_controller in controllers
+module.exports.home=function(req,res)
+{
+    return res.end('<h1>Express is up for Codeial!</h1>')
+}
+
+10)in routes/index
+const homeController=require('../controllers/home_controller');
+router.get('/',homeController.home);
+
+11)in terminal
+git add .
+git commit -m "added controller and routes"
+
+12)in users_controller.js in controllers
+module.exports.profile=function(req,res){
+    return res.end('<h1>User Profile</h1>');
+}
+
+13)create new route in route folder as users.js
+const express=require('express');
+const router=express.Router();
+
+const usersController=require('../controllers/users_controller');
+
+router.get('/profile',usersController.profile);
+module.exports=router;
+
+14) in routes/index.js
+router.use('/users',require('./users'));
+
+15)in terminal
+git add .
+git commit -m "added use_controller and routes"
+
+/*
+ejs=>embedded js
+It is a simple templating language/engine that lets its user generate HTML with plain javascript.
+*/
+
+16)npm install ejs
+
+17)in index.js
+app.set('view engine','ejs');
+app.set('views','./views')
+
+18)git add .
+git commit -m "added view engine ejs"
+
+19)created home.ejs in views
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+</head>
+<body>
+    <h1>
+        Codeial /<%= title %>
+    </h1>
+</body>
+</html>
+
+20)in home_controller.js
+module.exports.home=function(req,res)
+{
+    //return res.end('<h1>Express is up for Codeial!</h1>')
+    return res.render('home',{
+        title:'Home'
+    });
+}
+
+21)user.ejs in view
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+</head>
+<body>
+    <h1>
+        Codeial /<%= title %>
+    </h1>
+</body>
+</html>
+
+22)in users_controller.js
+module.exports.profile=function(req,res){
+    res.render('profile',{
+        title:'User-profile'
+    });
+}
+
+23)created _header.ejs 
+<header>
+    Page Header
+</header>
+
+and _footer.ejs
+<footer>
+    Page footer
+</footer>
+
+24)in home.ejs and profile.ejs
+<body>
+    <%- include('_header'); %>
+    <h1>
+        Codeial /<%= title %>
+    </h1>
+    <%- include('_footer'); %>
+</body>
+
+25)npm install express-ejs-layouts
+//basic layout template
+26)in index.js
+
+const expressLayouts=require('express-ejs-layouts');
+
+//use it before using routes as it belongs to view which is going to  be rendered in routes so before it gets rendered we neet to specify layout
+app.use(expressLayouts);
+
+27)in layout.ejs in view
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+</head>
+<body>
+    <%- include('_header'); %>
+    
+    <!-- here body is the variable part for different layouts -->
+    <%- body %>
+
+    <%- include('_footer'); %>
+</body>
+</html>
+
+28)change user_profile.ejs and home.ejs as
+<!-- whatever u write here will be rendered to body of the layout -->
+<h1>
+    Codeial /Profile
+</h1>
+
+29)index.js
+app.use(express.static('./assets'));
+30)layout.css in assets
+body{
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+31)in layout.ejs
+this is for styles required by things other than variable part
+<link rel="stylesheet" href="/css/layout.css">
+    
+32)in index.js for static files to be used by variable parts
+//extract style and scripts from subpages into the layout after calling expresslayout
+app.set('layout extractStyles',true);
+app.set('layout extractScripts',true);
+
+33)in layout.ejs
+put style and script tag for static used by variable body
+by writing <%-style%> and <%-script %> at appropriate places
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" href="/css/layout.css">
+    <%- style%>
+</head>
+<body>
+    <%- include('_header'); %>
+    
+    <!-- here body is the variable part for different layouts -->
+    <%- body %>
+
+    <%- include('_footer'); %>
+    <%- script%>
+</body>
+</html>
+
+
+/*
+routes and controllers setup done
+there is a main route index.js ,and all other routes are used in index.js
+after reaching the proper route ,the correspondent controller is called
+now controllers renders the view by calling specific view file
+each view file only contains body of that file ,that is the header,footer are managed in diff files which are included in the same
+now we used express-layout template to define the basic template of the file that would be viewed (rendered)
+now layout.ejs
+in this we include header,footer and remove from the other files
+here we include body as variable which would be sent by other view files which would be rendered at that place
+we create layout.css in assets and tells the main file(index.js) to use express.static files from assets
+now we do layout extractScripts and extractStyles , this is done as when the body variable of layout would be coming from 
+differnt file ,the diff file might have css and js , so now it would be placed in body that is in bw layout file
+to make static files to be positioned at proper place we do the same 
+
+*/
+
+34)npm install mongoose
+35)inside mongoose.js in config
+const mongoose=require('mongoose');
+mongoose.connect('mongodb://localhost/codeial_development');
+
+const db=mongoose.connection;
+db.on('error',console.error.bind(console,"Error connecting to mongodb"));
+db.once('open',function(){
+    console.log('connected to database::MongoDB');
+});
+
+module.exports=db;
+
+36)in index.js
+const db=require('./config/mongoose');
+
+37)creating schema
+in user.js in models
+const mongooese=require('mongoose');
+
+const userSchema=new mongooese.Schema({
+    email:{
+        type:String,
+        required:true,
+        unique:true
+    },
+    password:{
+        type:String,
+        required:true
+    },
+    name:{
+        type:String,
+        required:true
+    }
+
+},
+{
+    timestamps:true
+});
+
+const User=mongooese.model('User',userSchema);
+module.exports=User;
+
+38)create user_sign_in.ejs and user_sign_up.ejs in views
+<h1>
+    Sign In
+</h1>
+
+39)to render the view go in user_controller.js
+//render the sign up page
+module.exports.signUp=function(req,res){
+    return res.render('user_sign_up',{
+        title:"Codeial | Sign Up"
+    })
+}
+//render the sign in page
+module.exports.signIn=function(req,res){
+    return res.render('user_sign_in',{
+        title:"Codeial | Sign In"
+    })
+}
+
+
+40)in user.js in routes add the route
+router.get('/sign-up',usersController.signUp);
+router.get('/sign-in',usersController.signIn);
+
+41)in user_sign_up.ejs
+
+<form action="/users/create" method="POST">
+    <input type="text" name="name" placeholder="Your Name" required>
+    <input type="email" name="email" placeholder="Your email" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <input type="password" name="confirm password" placeholder="Confirm Password" required>
+    <input type="submit" value="Sign Up">
+</form>
+
+42)in user_sign_in.ejs
+<form action="/users/create-session" method="POST">
+    <input type="email" name="email" placeholder="Your email" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <input type="submit" value="Sign In">
+</form>
+
+43)//used for params and query in post request
+app.use(express.urlencoded());
+
+44)starting with manual authentication
+npm install cookie-parser
+
+45)
+const cookieParser=require('cookie-parser');
+app.use(cookieParser());
+
+46)in users_controller.js in controllers
+//importing model
+const User=require('../models/user');
+
+
+//get the signup data
+module.exports.create=function(req,res)
+{
+    //if password not equal to confirm password
+    if(req.body.password!=req.body.confirm_password)
+    {
+        return res.redirect('back');
+    }
+    User.findOne({email:req.body.email},function(err,user){
+        if(err){console.log('error in signing up');return;}
+
+        if(!user)
+        {
+            User.create(req.body,function(err,user){
+                if(err){console.log('error in signing up');return;}
+                return res.redirect('/users/sign-in');
+            })
+        }
+        else{
+            return res.redirect('back');
+        }
+    })
+} 
+
+47)in users.js in routes
+router.post('/create',usersController.create);
+
+48)after signing up in browser now,u can now check in studio3T 
+
+49)commiting and checkout back to master
+
+
+/*
+started with database
+installed and setup mongoose as per documentation ,all setups should be done in config
+required this connection in index.js
+creating a user model 
+to create a model first require mongoose,then create a schema ,then use this schema to create a model(check syntax) in user.js in models
+install cookie-parser and also call for express.urlencoded() before making a post req
+now creating signin and signup page forms ,the action mentioned here would be of type users/create...
+so this action would be managed in user.js routes which would then be controlled in users_controller
+now in user_controller , first require the model user,then there is a function to create =>User.create which creates a new user of type model User
+with information fetching from req.bodyduring this check for some conditions like if user already exists or password ,confirm password matching
+and then finally create user and redirect to sign in page(see syntax)
+this was all for manual authentication, now we'll use passport library
+*/
+
+
+50)npm install passport
+   npm install passport-local 
+
+51)passport-local-strategy.js in config
+const passport=require('passport');
+const LocalStrategy=require('passport-local').Strategy;
+const User=require('../models/user');
+
+
+
+//tell passport to use localstrategy
+passport.use(new LocalStrategy({
+        //always need to define usernameField with the one u use as username in schemma(one which is going to be unique)
+        usernameField:'email'
+    },
+    function(email,password,done)
+    {
+        //find a user and establish identity
+        User.findOne({
+            //the first email is of schemma property defined by us, the second one is the one which function takes as argument
+            email:email},function(err,user){
+                if(err)
+                {
+                    console.log('Error in finding user -->Passport');
+                    return done(err);
+                }
+                if(!user || user.password!=password){
+                    console.log('Invalid Username/Password');
+                    return done(null,false);
+                }
+                return done(null,user);
+        });
+    }
+))
+
+//serializing the user to decide which key is to be kept in the cookies
+//basically after finding the user ,alloting cookie to it based on its id and then passport encrypts it automatically
+passport.serializeUser(function(user,done){
+    done(null,user.id);
+});
+
+//deserializing the user from the key in the cookies
+passport.deserializeUser(function(id,done){
+    User.findById(id,function(err,user){
+        if(err)
+        {
+            console.log('Error in finding user -->Passport');
+            return done(err);
+        }
+        return done(null,user); 
+    });
+});
+
+module.exports=passport;
+
+52)npm install express-session
+
+53)index.js
+
+//used for session cookie
+const session=require('express-session');
+const passport=require('passport');
+const passportLocal=require('./config/passport-local-strategy');
+
+//after setting the views,use session as middleware 
+app.use(session({
+    name:'codeial',
+    //todo the secret before deployment in production mode
+    secret:'blahsomething',
+    saveUninitialized:false,
+    resave:false,
+    cookie:{
+        maxAge:(1000*60*100)
+        //100 min =>1000 millisec,60sec
+    }
+}))
+app.use(passport.initialize());
+app.use(passport.session());
+
+54)in use_controller
+//create session for sign in
+module.exports.createSession=function(req,res)
+{
+    return res.redirect('/');
+} 
+
+55)in user.js in routes
+//use passport as a middleware to authenticate
+
+router.post('/create-session',passport.authenticate(
+    'local',
+    {failureRedirect:'/users/sign-in'}
+),usersController.createSession);
+
+/*
+basically when create-session called it authenticates if done then call usercontroller.createSession otherwise redirect to sign-in
+*/
+
+55)in passport.js
+//sending data of logged in user to views
+
+//step 1]check if the user is authenticated
+passport.checkAuthentication=function(req,res,next){
+    //if the user is signed in ,then pass on the request to the next function(controllers action)
+    if(req.isAuthenticated()){
+        return next();
+    }
+    //if the user is not signed in
+    return res.redirect('/users/sign-in');
+}
+passport.setAuthenticatedUser=function(req,res,next){
+    if(req.isAuthenticated()){
+        //req.user contains the current signed in  user from the session cookie and we are just sending this to the locals for the views
+        res.locals.user=req.user;
+    }
+    next();
+}
+
+56)in users.js routes
+router.get('/profile',passport.checkAuthentication,usersController.profile);
+
+57)index.js
+app.use(passport.setAuthenticatedUser)
+
+
+58)in profile.ejs
+<!-- user available bcoz we made res.locals.user=req.user in passport.js -->
+<p><%= user.name%></p>
+<p><%= user.email%></p>
+
+59)in use_controller.js
+//render the sign up page
+module.exports.signUp=function(req,res){
+
+    //we only want user to access signup page when not signed in that is not authenticated
+    //otherwise redirect to profile page
+    if(req.isAuthenticated()){
+        return res.redirect('/users/profile');
+    }
+    return res.render('user_sign_up',{
+        title:"Codeial | Sign Up"
+    })
+}
+//render the sign in page
+module.exports.signIn=function(req,res){
+    if(req.isAuthenticated()){
+        return res.redirect('/users/profile');
+    }
+    return res.render('user_sign_in',{
+        title:"Codeial | Sign In"
+    })
+}
+
+60)npm install connect-mongo
+
+61)index.js
+//using mongostore to store the session cookies so that after every restart of server user does not gets logged out that is store all the session cookies in database
+const MongoStore= require('connect-mongo');
+
+
+
+//after setting the views,use session as middleware 
+//mongo store is udes to store the session cookie in db
+app.use(session({
+    name:'codeial',
+    //todo the secret before deployment in production mode
+    secret:'blahsomething',
+    saveUninitialized:false,
+    resave:false,
+    cookie:{
+        maxAge:(1000*60*100)
+        //100 min =>1000 millisec,60sec
+    },
+    store:MongoStore.create({
+            //got this url from mongodb atlas application
+            mongoUrl:'mongodb://localhost:27017',
+            autoRemove:'disabled'
+    },function(err)
+    {
+        console.log(err || 'connect-mongo-db setup ok');
+    })
+}))
+
+62)header.ejs
+<ul>
+        <% if (locals.user) {%>
+            <li>
+                <a href="/users/profile">
+                    <%=user.name%>
+                </a>
+            </li>
+            <li>
+                <a href="/users/sign-out">Sign Out</a>
+            </li>
+        <%}else{%>
+            <li>
+                <a href="/users/sign-in">Sign In</a>
+            </li>
+            <li>
+                <a href="/users/sign-up">Sign Up</a>
+            </li>
+        <% } %>
+    </ul>
+
+63)user_controller.js
+
+module.exports.destroySession=function(req,res){
+    req.logout(function(err)
+    {
+        if(err){return res.redirect('back');}
+        return res.redirect('/');
+    });
+}
+
+64)user.js in routes
+router.get('/sign-out',usersController.destroySession);
+
+/*
+Passport
+library used to authenticate users
+passport local authenticates based on two parameters username and password
+create the directed way to initialize passport local shown in documentation
+after that serialize and deserialize the user =>serializing the user to decide which key is to be kept in the cookies,
+basically after finding the user ,alloting cookie to it based on its id and then passport encrypts it automatically
+deserializing the user from the key in the cookies
+Now instead of using cookie-parser we will now use express-session as it stores the cookie in server also with unlimited data and you can read about session over cookies difference
+after setting the views,use session as middleware 
+now use the session=>give name to the session,secret which would be used to serialize user,set the cookie properties like maxAge
+now call for passport.initialize and passport.session()
+now can use passport to authenticate signin process by using passport as middleware to direct to controller from routes
+make checkAuthentication function which let user go to next page if authenticated
+also make setAuthenticatedUser function and there set the locals in response with req.user
+tell index.js to use setAuthenticatedUser, now update the signup,signin page by if user already authenticated then automatically redirect to next required page
+=> we only want user to access signup page when not signed in that is not authenticated,otherwise redirect to profile page
+now since after every server refresh the sessions are lost to store the sessions in database we use connect-mongo 
+If you don't want to use a database for your chat, you should store the messages into a simple hash. But keep in mind,
+if you restart your node application, they will be lost.MongoStore (or RedisStore) allows you to store the Express sessions into MongoDB/Redis
+instead of using the MemoryStore, which is not designed for a production environment.
+after setting it update the app.use(session) part by setting store:Mongostore......
+now when all set can change header ejs too and say that if user is authenticated then show profile and signout opt otherwise signin,signup opt
+to signout we use req.logout this  only removes the user from the session,not the other things eg:=>
+Before logout:
+"{"cookie":{"originalMaxAge":259200000,"expires":"2014-03-21T22:03:55.265Z","httpOnly":true,"path":"/"},"passport":{"user":"bn"}}"
+After logout:
+"{"cookie":{"originalMaxAge":259200000,"expires":"2014-03-21T22:04:01.148Z","httpOnly":true,"path":"/"},"passport":{}}"
+
+user has been removed but other cookies are still there and the complete session is not destroyed
+*/
+
+65)including sass
+npm install node-sass-middleware
+
+66)index.js
+// setting up sass
+const sassMiddleware=require('node-sass-middleware');
+app.use(sassMiddleware({
+    src:'./assets/scss',
+    dest:'./assets/css',
+    debug:true,
+    outputStyle:'extended',
+    prefix:'/css'
+}))
+
+
+67)moved two css files into scss and changing extension to .scss
+68)header.ejs edited
+<header>
+    <div id="logo">
+        <p><span class="symb">&lt</span>CODEIAL<span class="symb">/&gt</span></p>
+    </div>
+    <div id="auth">
+        <ul>
+            <% if (locals.user) {%>
+                <li>
+                    <a href="/users/profile">
+                        PROFILE
+                    </a>
+                </li>
+                <li>
+                    <a href="/users/sign-out">SIGN OUT</a>
+                </li>
+            <%}else{%>
+                <li>
+                    <a href="/users/sign-in">Sign In</a>
+                </li>
+                <li>
+                    <a href="/users/sign-up">Sign Up</a>
+                </li>
+            <% } %>
+        </ul>
+    </div>
+</header>
+
+69)header.scss
+header{
+    display: flex;
+    justify-content: space-between;
+    height: 75px;
+    background-color: rgb(59, 50, 219);
+    #auth{
+        margin-right: 3%;
+        width: auto;
+        display: flex;
+        align-items: center;
+        ul li{
+            list-style: none;
+            text-decoration: none;
+            display: inline-block;
+            padding: 0.3rem;
+            a{
+                color: aliceblue;
+                text-decoration: none;
+                font-weight: 500;
+                font-size: 1rem;
+                letter-spacing: 0.5px;
+                font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            }
+        }
+    }
+    #logo{
+        margin-left: 3%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        p{
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            .symb{
+                color: rgb(227, 247, 6);
+                margin-right: 0.5rem;
+            }
+        }
+    }
+}
+
+/*
+included sass(npm install  node-sass-middleware)
+writing scss is much more easier than long css
+
+const sassMiddleware=require('node-sass-middleware');
+app.use(sassMiddleware({
+    src:'./assets/scss',
+    dest:'./assets/css',
+    debug:true,
+    outputStyle:'extended',
+    prefix:'/css'
+}))
+src - (String) Source directory used to find .scss or .sass files.
+dest - (String) Destination directory used to output .css files (when undefined defaults to src).
+prefix - (String) It will tell the sass middleware that any request file will always be prefixed with <prefix> and this prefix should be ignored.
+*/
+
+70)in post.js in models
+const mongoose=require('mongoose');
+const postSchema=new mongoose.Schema({
+    content:{
+        type:String,
+        required:true
+    },
+    //here linking with user schema as post would be done by a user
+    user:{
+        //type=in robo3t u can see each user has objectid we will make of that type
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
+    }
+},
+{
+    timestamps:true
+});
+
+const Post=mongoose.model('Post',postSchema);
+module.exports=Post;
+
+71)home.ejs in views
+<h1>
+    Codeial /<%= title %>
+</h1>
+<section id="feed-posts">
+    <h2>Posts</h2>
+    <form action="/posts/create" id="new-post-form" method="POST">
+        <textarea name="content" cols="30" rows="3" placeholder="Type Here..."></textarea>
+        <input type="submit" value="Post">
+    </form>
+</section>
+
+72)posts_controller.js in controllers
+const Post=require('../models/post');
+module.exports.create=function(req,res)
+{
+    //we have got the post schema above
+    //now can access content,user
+    //here user._id (can refer in robo3t)
+    //req.body.content is bcoz we hv given name of form as content
+    Post.create({
+        content:req.body.content,
+        user:req.user._id
+    },function(err,post){
+        if(err){console.log('error in creating post');return;}
+        return res.redirect('back');
+    })
+}
+
+73)in posts.js in router
+const express=require('express');
+const router=express.Router();
+
+const postsController=require('../controllers/posts_controller');
+
+router.post('/create',postsController.create);
+module.exports=router;
+
+74)index.js in routes
+router.use('/posts',require('./posts'));
+
+75)home_controller.js
+const Post=require('../models/post');
+module.exports.home=function(req,res)
+{
+
+    Post.find({},function(err,posts)
+    {
+        return res.render('home',{
+            title:'Codeial | Home',
+            posts:posts
+        });
+    })
+}
+
+76)home.ejs
+<h1>
+    Codeial /<%= title %>
+</h1>
+<section id="feed-posts">
+    <h2>Posts</h2>
+    <form action="/posts/create" id="new-post-form" method="POST">
+        <textarea name="content" cols="30" rows="3" placeholder="Type Here..."></textarea>
+        <input type="submit" value="Post">
+    </form>
+
+    //code changed from here
+    <div id="posts-list-container">
+        <ul>
+            <%for(post of posts){%>
+                <li>
+                    <%= post.content%>
+                </li>
+            <%}%>
+        </ul>
+    </div>
+</section>
+
+77)home_controller.js
+const Post=require('../models/post');
+module.exports.home=function(req,res)
+{
+
+    //with this if we do post.user in home.ejs it only gives id (since we hv set user:req.user._id in post_controller)of the user,but if we need name,email,timecreated we need to populate the user
+    
+    // Post.find({},function(err,posts)
+    // {
+    //     return res.render('home',{
+    //         title:'Codeial | Home',
+    //         posts:posts
+    //     });
+    // })
+
+
+    //populate the user of each post
+    Post.find({}).populate('user').exec(function(err,posts)
+    {
+        return res.render('home',{
+            title:'Codeial | Home',
+            posts:posts
+        });
+    })
+}
+
+78)home.ejs
+<h1>
+    Codeial /<%= title %>
+</h1>
+<section id="feed-posts">
+    <h2>Posts</h2>
+    //only if user is signed in view post input area
+    <%if(locals.user){%>
+        <form action="/posts/create" id="new-post-form" method="POST">
+            <textarea name="content" cols="30" rows="3" placeholder="Type Here..."></textarea>
+            <input type="submit" value="Post">
+        </form>
+    <%}%>
+    <div id="posts-list-container">
+        <ul>
+            <%for(post of posts){%>
+                <li>
+                    <p>
+                        <%= post.content%>
+                        <br>
+                        <small>
+                            <%=post.user.name%>
+                        </small>
+                    </p>
+                </li>
+            <%}%>
+        </ul>
+    </div>
+</section>
+
+79)in posts.js in routes
+//check if user is authenticated then only create post
+router.post('/create',passport.checkAuthentication,postsController.create);
+
+80)comment.js in model //creating comments schema
+const mongoose=require('mongoose');
+const commentSchema=new mongoose.Schema({
+    content:{
+        type:String,
+        required:true
+    },
+    //comment belongs to a user
+    user:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
+    },
+    post:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Post'
+    }
+},
+{
+    timestamps:true
+});
+
+const Comment=mongoose.model('Comment',commentSchema);
+module.exports=Comment;
+
+81)in post.js in models
+//added comments array in schema
+
+const postSchema=new mongoose.Schema({
+    content:{
+        type:String,
+        required:true
+    },
+    //here linking with user schema as post would be done by a user
+    user:{
+        //type=in robo3t u can see each user has objectid we will make of that type
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
+    },
+    //include the array of ids of all comments in this post schema itself
+    comments:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Comment'
+    }]
+},
+{
+    timestamps:true
+});
+
+82)home.ejs
+in post-list-container added comments section
+<div id="posts-list-container">
+        <ul>
+            <%for(post of posts){%>
+                <li>
+                    <p>
+                        <%= post.content%>
+                        <br>
+                        <small>
+                            <%=post.user.name%>
+                        </small>
+                    </p>
+                    <div class="post-comments">
+                        <%if(locals.user){%>
+                            <form action="/comments/create" method="POST">
+                                <input type="text" name="content" placeholder="Type Here to add comment...">
+                                <input type="hidden" name="post" value="<%=post._id%>" >
+                                <input type="submit" value="Add Comment">
+                            </form>
+                        <%}%>
+                    </div>
+                </li>
+            <%}%>
+        </ul>
+    </div>
+
+83)comments_controller.js
+
+const Comment=require('../models/comment');
+const Post=require('../models/post');
+module.exports.create=function(req,res){
+    //req.body.post as we hv given name as post in input with type hidden
+    Post.findById(req.body.post,function(err,post){
+        if(post)
+        {
+            Comment.create({
+                content:req.body.content,
+                post:req.body.post,
+                user:req.user._id
+            },function(err,comment){
+
+                //updating the posts schema as well that is pushing the comment in the comments array
+                post.comments.push(comment);
+                post.save();
+
+                res.redirect('/');
+            });
+        }
+    })
+}
+
+84)comments.js in routes
+const express=require('express');
+const router=express.Router();
+const passport=require('passport');
+const commentsController=require('../controllers/comments_controller');
+
+
+//check if user is authenticated then only create post
+router.post('/create',passport.checkAuthentication,commentsController.create);
+module.exports=router;
+
+85)index.js in routes
+router.use('/comments',require('./comments'));
+
+86)home_controller.js 
+updated the populte part
+//populate the user of each post
+    //also populate comments and done by which user
+    Post.find({})
+    .populate('user')
+    .populate({
+        path:'comments',//as we have name the array in post schema as comments
+        populate:{
+            path:'user'//name the user in post schema as user
+        }
+    })
+    .exec(function(err,posts)
+    {
+        return res.render('home',{
+            title:'Codeial | Home',
+            posts:posts
+        });
+    })
+
+87)updated home.ejs
+<h1>
+    Codeial /<%= title %>
+</h1>
+<section id="feed-posts">
+    <h2>Posts</h2>
+    <!-- only if user is signed in view post input area -->
+    <%if(locals.user){%>
+        <form action="/posts/create" id="new-post-form" method="POST">
+            <textarea name="content" cols="30" rows="3" placeholder="Type Here..." required></textarea>
+            <input type="submit" value="Post">
+        </form>
+    <%}%>
+    <div id="posts-list-container">
+        <ul>
+            <%for(post of posts){%>
+                <li>
+                    <p>
+                        <%= post.content%>
+                        <br>
+                        <small>
+                            <%=post.user.name%>
+                        </small>
+                    </p>
+                    <div class="post-comments">
+                        <%if(locals.user){%>
+                            <form action="/comments/create" method="POST">
+                                <input type="text" name="content" placeholder="Type Here to add comment..." required>
+                                <input type="hidden" name="post" value="<%=post._id%>" >
+                                <input type="submit" value="Add Comment">
+                            </form>
+                        <%}%>
+                        <div class="post-comments-list">
+                            <ul id="post-comments-<%=post._id%>">
+                                <%for(comment of post.comments){%>
+                                    <p>
+                                        <%=comment.content%>
+                                        <br>
+                                        <small>
+                                            <%=comment.user.name%>
+                                        </small>
+                                    </p>
+                                <%}%>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+            <%}%>
+        </ul>
+    </div>
+</section>
+
+
+88)in post_controller
+//starting to delete the post
+
+const Comment=require('../models/comment');
+
+//will be deleting according to action=> /posts/destroy/:id
+//in params there would be id of post
+module.exports.destroy=function(req,res){
+    Post.findById(req.params.id,function(err,post){
+        //.id means converting the object id (._id) to string
+        if(post.user==req.user.id)
+        {
+            post.remove();
+            Comment.deleteMany({
+                post:req.params.id
+            },function(err){
+                return res.redirect('back');
+            });
+        }else{
+            return res.redirect('back');
+        }
+    });
+}
+
+89)post.js in routes
+router.get('/destroy/:id',passport.checkAuthentication,postsController.destroy);
+
+90)home.ejs
+
+//added delete post option in views ,check home.ejs file to know where it has been added
+ <% if(locals.user && locals.user.id==post.user.id){%>
+    <small>
+        <a href="/posts/destroy/<%=post.id%>">X</a>
+    </small>
+<%}%>
+
+91)comments_controller.js
+//deleting comment
+module.exports.destroy=function(req,res){
+    Comment.findById(req.params.id,function(err,comment){
+        if(comment.user==req.user.id){
+            //since we also need to delete comment from the comments array of that particular post
+            let postId=comment.post;
+            comment.remove();
+            //update by pull out from comments array the id with req.params.id that is comment id
+            Post.findByIdAndUpdate(postId,{$pull:{comments:req.params.id}},function(err,post){
+                return res.redirect('back');
+            });
+        }
+        else{
+            return res.redirect('back');
+        }
+    })
+}
+
+92)comment.js in routes
+router.get('/destroy/:id',passport.checkAuthentication,commentsController.destroy);
+
+93)home.ejs updated
+
+ <%for(comment of post.comments){%>
+    <p>
+        <% if(locals.user && locals.user.id==comment.user.id){%>
+            <small>
+                <a href="/comments/destroy/<%=comment.id%>">X</a>
+            </small>
+        <%}%>
+        <%=comment.content%>
+        <br>
+        <small>
+            <%=comment.user.name%>
+        </small>
+    </p>
+<%}%>
+
+94)created partials for comments and posts that is included them in another file named as _comment.ejs and _post.ejs ,checkit out
+
+95)home_controller
+
+//to get all the users on the home page
+    //populate the user of each post
+    //also populate comments and done by which user
+    Post.find({})
+    .populate('user')
+    .populate({
+        path:'comments',//as we have name the array in post schema as comments
+        populate:{
+            path:'user'//name the user in post schema as user
+        }
+    })
+    .exec(function(err,posts)
+    {
+        User.find({},function(err,users){
+            return res.render('home',{
+                title:'Codeial | Home',
+                posts:posts,
+                //getting all users
+                all_users:users
+            });
+        })
+    })
+}
+
+96)home.ejs
+<section id="user-friends">
+    <h4>Friends</h4>
+    <% for(u of all_users){%>
+        <p>
+            <a href="/users/profile/<%=u.id%>"><%= u.name%></a>
+        </p>
+    <%}%>
+</section>
+
+97)user.js in routes
+router.get('/profile/:id',passport.checkAuthentication,usersController.profile);
+
+98)updated profile action in user_controller
+module.exports.profile=function(req,res){
+    User.findById(req.params.id,function(err,user){
+            return res.render('profile',{
+                title:'User Profile',
+                profile_user:user
+        });
+    })
+}
+
+99)profile.ejs
+
+//viewed links to profile of users
+<p><%= profile_user.name%></p>
+<p><%= profile_user.email%></p>
+
+100)profile.ejs
+different view of profile page for self than that of friends
+<% if(user.id==profile_user.id){ %>
+    <!-- if user matches then show the updation form otherwise just show profile info -->
+    <form action="/users/update/<%=profile_user.id%>" method:"POST">
+        <input type="text" name="name" placeholder="Your Name" value="<%=profile_user.name%>" required>
+        <input type="email" name="email" placeholder="Your Email" value="<%=profile_user.email%>" required>
+        <input type="submit" value="UPDATE">
+    </form>
+<%}else{%>
+    <p><%= profile_user.name%></p>
+    <p><%= profile_user.email%></p>
+<%}%>
+
+101)user_controller.js
+module.exports.update=function(req,res){
+    if(req.user.id==req.params.id){
+        User.findByIdAndUpdate(req.params.id,req.body,function(err,User){
+            return res.redirect('back');
+        });
+    }else{
+        //if someone tries to fiddle by inspect nd then change id then show http 401 unauthorized part
+        return res.status(401).send('Unauthorized');
+    }
+}
+
+102)user.js in routes
+router.post('/update/:id',passport.checkAuthentication,usersController.update);
+
+103)home.scss
+
+//also changed home.ejs a bit have a look 
+#home-container{
+    display: flex;
+    height: 100%;
+    #feed-posts{
+        width: 70%;
+        padding: 10px;
+
+    }
+
+    #user-friends{
+        width:30%;
+        padding:10px;
+        border-left: 1px solid lightgrey;
+        height: 100%;
+    }
+}
+
+
+//NOW CHANGING ALL CONTROLLER CODES TO ASYNC AWAIT 
+//WHEREEVER THERE IS NESTING OF CALLBACKS(CALLBACK HELL) ,IF ONLY ONE CALLBACK THEN NOT NEEDED
+//IN CALLBACK THE VARIABLE WE USE IF NEEDED SO GET IT IN LET VARIABLE(POSTS,COMMENT,ETC)
+
+
+104)home_controller
+changed the code to look neat and handle errors
+
+
+module.exports.home= async function(req,res)
+{
+    try{
+        let posts=await Post.find({})
+        .populate('user')
+        .populate({
+            path:'comments',//as we have name the array in post schema as comments
+            populate:{
+                path:'user'//name the user in post schema as user
+            }
+        });
+
+        let users=await User.find({});
+
+        return res.render('home',{
+            title:'Codeial | Home',
+            posts:posts,
+            all_users:users
+        });
+    }catch(err){
+        console.log('Error',err);
+        return; 
+    }
+}
+
+105)posts_controller
+const Post=require('../models/post');
+const Comment=require('../models/comment');
+module.exports.create=async function(req,res)
+{
+    try{
+        await Post.create({
+            //we have got the post schema above
+            //now can access content,user
+            //here user._id (can refer in robo3t)
+            //req.body.content is bcoz we hv given name of form as content
+            content:req.body.content,
+            user:req.user._id
+        });
+        return res.redirect('back');
+    }catch(err)
+    {
+        console.log('Error',err);
+    }
+}
+
+//will be deleting according to action=> /posts/destroy/:id
+//in params there would be id of post
+module.exports.destroy=async function(req,res){
+    try{
+        let post=await Post.findById(req.params.id);
+        //.id means converting the object id (._id) to string
+        if(post.user==req.user.id)
+        {
+            post.remove();
+            await Comment.deleteMany({
+                post:req.params.id
+            });
+            return res.redirect('back');
+        }else{
+            return res.redirect('back');
+        }
+    }catch(err)
+    {
+        console.log('Error',err);
+    }
+    
+}
+
+106)comments_controller
+
+const Comment=require('../models/comment');
+const Post=require('../models/post');
+
+module.exports.create=async function(req,res){
+    try{
+        //req.body.post as we hv given name as post in input with type hidden
+        let post=await Post.findById(req.body.post)
+        if(post)
+        {
+            let comment=await Comment.create({
+                content:req.body.content,
+                post:req.body.post,
+                user:req.user._id
+            });
+            //updating the posts schema as well that is pushing the comment in the comments array
+            post.comments.push(comment);
+            post.save();
+
+            res.redirect('/');
+        }
+    }catch(err)
+    {
+        console.log('Error',err);
+    }
+}
+
+module.exports.destroy=async function(req,res){
+    try{
+        let comment=await Comment.findById(req.params.id);
+        if(comment.user==req.user.id){
+            //since we also need to delete comment from the comments array of that particular post
+            let postId=comment.post;
+            comment.remove();
+            //update by pull out from comments array the id with req.params.id that is comment id
+            let post=await Post.findByIdAndUpdate(postId,{$pull:{comments:req.params.id}});
+            return res.redirect('back');
+        }
+        else{
+            return res.redirect('back');
+        }
+    }catch(err)
+    {
+        console.log('Error',err);
+    }
+}
+
+
+/*
+using flash library for notifiactions
+
+set up the library flash
+used it after session being used
+setup msgs in users_controller
+then to pass on these msgs to html/ejs created a middleware
+to put the msg from req to res
+in middleware it fetches from req and put it in locals
+now we used it in index.js=>app.use(customMware.setFlash)
+now include it in view that is include it in layout after header
+*/
+
+107)using flash library for notifiactions
+npm install connect-flash
+
+108)index.js
+
+const flash=require('connect-flash');
+
+//use flash after session is being used,bcoz flash uses session cookies
+//whenever a session is created it will notify once as in if u r sign in and refresh it should not again show logged in successfully, but only when u hv signed out or session has been expired
+app.use(flash());
+
+109)user_controller
+added flash messages
+
+//create session for sign in
+module.exports.createSession=function(req,res)
+{
+    req.flash('success','Logged in Successfully');
+    return res.redirect('/');
+} 
+
+module.exports.destroySession=function(req,res){
+    req.logout(function(err)
+    {
+        if(err){return res.redirect('back');}
+        
+        req.flash('success','You have logged out!');
+        return res.redirect('/');
+    });
+}
+
+110)middleware.js in config
+
+//to get the flash msg from req and put it into res
+module.exports.setFlash=function(req,res,next)
+{
+    res.locals.flash={
+        'success':req.flash('success'),
+        'error':req.flash('error')
+    }
+    next();
+}
+
+111)index.js
+
+//called middleware and used it
+//check the location where they r used
+const customMware=require('./config/middleware');
+app.use(customMware.setFlash);
+
+112)layout.ejs
+<!-- if flash has success msg and that to non empty -->
+<% if(flash.success && flash.success.length>0){ %>
+    <h5>
+        <%= flash.success%>
+    </h5>
+<%}%>   
+
+113)using noty js to beautify our notifiactions
+
+in layout.ejs
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"></script>
+    
+<script>
+//  if flash has success msg and that to non empty
+<% if(flash.success && flash.success.length>0){ %>
+    new Noty({
+        theme:'relax',
+        text: "<%=flash.success%>",
+        type:'success',
+        layout:'topRight',
+        timeout:1500
+    }).show();
+<%}%> 
+<% if(flash.error && flash.error.length>0){ %>
+    new Noty({
+        theme:'relax',
+        text: "<%=flash.error%>",
+        type:'error',
+        layout:'topRight',
+        timeout:1500
+    }).show();
+<%}%> 
+</script>
+
+114)passport-local.js
+
+//edited to use noty js
+//passReqToCallback:true
+//chnaged func arguments to=>function(req,email,password,done)
+//then used flash
+
+
+//tell passport to use localstrategy
+passport.use(new LocalStrategy({
+        //always need to define usernameField with the one u use as username in schemma(one which is going to be unique)
+        usernameField:'email',
+        //this will allow to pass req variable to callback
+        passReqToCallback:true
+    },
+    function(req,email,password,done)
+    {
+        //find a user and establish identity
+        User.findOne({
+            //the first email is of schemma property defined by us, the second one is the one which function takes as argument
+            email:email},function(err,user){
+                if(err)
+                {
+                    req.flash('error',err);
+                    return done(err);
+                }
+                if(!user || user.password!=password){
+                    req.flash('error','Invalid Username/Password');
+                    return done(null,false);
+                }
+                return done(null,user);
+        });
+    }
+))
+
+115)updated user_controller,post_controller,comments_controller
+with flash msgs
+
+116)including jquery ajax(as whenever we post or comment whole page refreshes which we dont want ,we want only that part gets updated not refreshed the whole page)
+in layout.ejs 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+117)in home.ejs
+<script src="/js/home_posts.js"></script>
+
+118)home_posts.js in js in assets
+{    
+    //method to submit the form data for new post using ajax
+    let createPost=function(){
+        //getting form from home.ejs id
+        let newPostForm=$('#new-post-form');
+        //preventing default action of submit as we need to submit through ajax
+        newPostForm.submit(function(e){
+            e.preventDefault();
+            //now submitting through ajax
+            $.ajax({
+                type:'post',
+                url:'/posts/create',
+                //converts post data into json like content becomes key and value is the one entered
+                data:newPostForm.serialize(),
+                success:function(data){
+                    console.log(data);
+                },error:function(error){
+                    console.log(error.responseText);
+                }
+            });
+        });
+    }
+
+    //method to create a post in dom
+    
+    createPost();
+} 
+
+119)post_controller.js
+updated with req.xhr
+module.exports.create=async function(req,res)
+{
+    try{
+        let post=await Post.create({
+            //we have got the post schema above
+            //now can access content,user
+            //here user._id (can refer in robo3t)
+            //req.body.content is bcoz we hv given name of form as content
+            content:req.body.content,
+            user:req.user._id
+        });
+
+        //if the req is in xhml http request i.e via ajax
+        if(req.xhr){
+            return res.status(200).json({
+                data:{
+                    post:post
+                },
+                message:"Post created!"
+            })
+        }
+
+        req.flash('success','Post published!');
+        return res.redirect('back');
+    }catch(err)
+    {
+        req.flash('error',err);
+        return res.redirect('back');
+    }
+}
+
+120)home_posts.js in js assets
+{    
+    //method to submit the form data for new post using ajax
+    let createPost=function(){
+        //getting form from home.ejs id
+        let newPostForm=$('#new-post-form');
+        //preventing default action of submit as we need to submit through ajax
+        newPostForm.submit(function(e){
+            e.preventDefault();
+            //now submitting through ajax
+            $.ajax({
+                type:'post',
+                url:'/posts/create',
+                //converts post data into json like content becomes key and value is the one entered
+                data:newPostForm.serialize(),
+                success:function(data){
+                    let newPost=newPostDom(data.data.post);
+                    $('#posts-list-container>ul').prepend(newPost);
+                },error:function(error){
+                    console.log(error.responseText);
+                }
+            });
+        });
+    }
+
+    //method to create a post in dom
+    let newPostDom=function(post){
+        //copied from _post.ejs and removed unnecessary checks
+        return $(`
+                    <li id="post-${post._id}">
+                    <p>
+                        <small>
+                            <a class="delete-post-button" href="/posts/destroy/${post.id}">X</a>
+                        </small>
+
+                        ${ post.content}
+                        <br>
+                        <small>
+                        ${post.user.name$}
+                        </small>
+                    </p>
+                    <div class="post-comments">
+                        <form action="/comments/create" method="POST">
+                            <input type="text" name="content" placeholder="Type Here to add comment..." required>
+                            <input type="hidden" name="post" value="${post._id}" >
+                            <input type="submit" value="Add Comment">
+                        </form>
+
+                        <div class="post-comments-list">
+                            <ul id="post-comments-${post._id}"> 
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+        `)
+    }
+
+    createPost();
+} 
+
+121)home_controller.js
+added sort func to creation of post
+module.exports.home= async function(req,res)
+{
+    try{
+        let posts=await Post.find({})
+        .sort('-createdAt')//sort acc to time of creation=>latest one showimg first
+        .populate('user')
+        .populate({
+            path:'comments',//as we have name the array in post schema as comments
+            populate:{
+                path:'user'//name the user in post schema as user
+            }
+        });
+
+        let users=await User.find({});
+
+        return res.render('home',{
+            title:'Codeial | Home',
+            posts:posts,
+            all_users:users
+        });
+    }catch(err){
+        console.log('Error',err);
+        return; 
+    }
+}
+
+122)home_posts.js in assets js
+{    
+    //method to submit the form data for new post using ajax
+    let createPost=function(){
+        //getting form from home.ejs id
+        let newPostForm=$('#new-post-form');
+        //preventing default action of submit as we need to submit through ajax
+        newPostForm.submit(function(e){
+            e.preventDefault();
+            //now submitting through ajax
+            $.ajax({
+                type:'post',
+                url:'/posts/create',
+                //converts post data into json like content becomes key and value is the one entered
+                data:newPostForm.serialize(),
+                success:function(data){
+                    //data.data.post can be seen as when we learnt api ,u can console log data on that u can see data in that post
+                    let newPost=newPostDom(data.data.post);
+                    $('#posts-list-container>ul').prepend(newPost);
+                    deletePost($(' .delete-post-button',newPost));//space before class name here to adjust newPost
+                },error:function(error){
+                    console.log(error.responseText);
+                }
+            });
+        });
+    }
+
+    //method to create a post in dom
+    let newPostDom=function(post){
+        //copied from _post.ejs and removed unnecessary checks
+        return $(`
+                    <li id="post-${post._id}">
+                    <p>
+                        <small>
+                            <a class="delete-post-button" href="/posts/destroy/${post._id}">X</a>
+                        </small>
+
+                        ${ post.content}
+                        <br>
+                        <small>
+                        ${post.user.name$}
+                        </small>
+                    </p>
+                    <div class="post-comments">
+                        <form action="/comments/create" method="POST">
+                            <input type="text" name="content" placeholder="Type Here to add comment..." required>
+                            <input type="hidden" name="post" value="${post._id}" >
+                            <input type="submit" value="Add Comment">
+                        </form>
+
+                        <div class="post-comments-list">
+                            <ul id="post-comments-${post._id}"> 
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+        `)
+    }
+
+    //method to delete a post from dom using ajax
+    let deletePost=function(deleteLink){
+        $(deleteLink).click(function(e){
+            e.preventDefault();
+
+            $.ajax({
+                type:'get',
+                url:$(deleteLink).prop('href'),//get href part from a tag , that is we hv passed a tag as deletelink
+                success:function(data){
+                    $(`#post-${data.data.post_id}`).remove();
+                },error:function(error){
+                    console.log(error.responseText);
+                }
+            })
+        })
+    }
+
+
+
+
+    createPost();
+} 
+
+123)post_controller
+//added req.xhr opt
+
+module.exports.destroy=async function(req,res){
+    try{
+        let post=await Post.findById(req.params.id);
+        //.id means converting the object id (._id) to string
+        if(post.user==req.user.id)
+        {
+            post.remove();
+            await Comment.deleteMany({
+                post:req.params.id
+            });
+
+            if(req.xhr)
+            {
+                return res.status(200).json({
+                    data:{
+                        post_id:req.params.id
+                    },
+                    message:"Post Deleted"
+                });
+            }
+
+            req.flash('success','Post and associated comments deleted!')
+            return res.redirect('back');
+        }else{
+            req.flash('error','You cannot delete this post');
+            return res.redirect('back');
+        }
+    }catch(err)
+    {
+        req.flash('error',err);
+        return res.redirect('back');
+    }
+    
+}
+
+
+124)home_posts.js assets js
+{
+     //method to submit the form data for new post using ajax
+    let createPost=function(){
+        //getting form from home.ejs id
+        let newPostForm=$('#new-post-form');
+        //preventing default action of submit as we need to submit through ajax
+        newPostForm.submit(function(e){
+            e.preventDefault();
+            //now submitting through ajax
+            $.ajax({
+                type:'post',
+                url:'/posts/create',
+                //converts post data into json like content becomes key and value is the one entered
+                data:newPostForm.serialize(),
+                success:function(data){
+                    // console.log(data);
+                    //data.data.post can be seen as when we learnt api ,u can console log data on that u can see data in that post
+                    let newPost=newPostDom(data.data.post);
+                    $('#posts-list-container>ul').prepend(newPost);
+                    deletePost($(' .delete-post-button',newPost));//space before class name here to adjust newPost
+                    
+                    new Noty({
+                        theme: 'relax',
+                        text: "Post published!",
+                        type: 'success',
+                        layout: 'topRight',
+                        timeout: 1500
+                        
+                    }).show();
+
+                },error:function(error){
+                    console.log(error.responseText);
+                }
+            });
+        });
+    }
+
+    //method to create a post in dom
+    let newPostDom=function(post){
+        //copied from _post.ejs and removed unnecessary checks
+        return $(`
+                    <li id="post-${post._id}">
+                    <p>
+                        <small>
+                            <a class="delete-post-button" href="/posts/destroy/${post._id}">X</a>
+                        </small>
+
+                        ${ post.content}
+                        <br>
+                        <small>
+                        ${post.user.name}
+                        </small>
+                    </p>
+                    <div class="post-comments">
+                        <form id="post-${ post._id }-comments-form" action="/comments/create" method="POST">
+                            <input type="text" name="content" placeholder="Type Here to add comment..." required>
+                            <input type="hidden" name="post" value="${post._id}" >
+                            <input type="submit" value="Add Comment">
+                        </form>
+
+                        <div class="post-comments-list">
+                            <ul id="post-comments-${post._id}"> 
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+        `)
+    }
+
+    //method to delete a post from dom using ajax
+    let deletePost=function(deleteLink){
+        $(deleteLink).click(function(e){
+            e.preventDefault();
+
+            $.ajax({
+                type:'get',
+                url:$(deleteLink).prop('href'),//get href part from a tag , that is we hv passed a tag as deletelink
+                success:function(data){
+                    $(`#post-${data.data.post_id}`).remove();
+                    new Noty({
+                        theme: 'relax',
+                        text: "Post Deleted",
+                        type: 'success',
+                        layout: 'topRight',
+                        timeout: 1500
+                        
+                    }).show();
+
+                },error:function(error){
+                    console.log(error.responseText);
+                }
+            });
+        });
+    }
+
+    // loop over all the existing posts on the page (when the window loads for the first time) and call the delete post method on delete link of each, also add AJAX (using the class we've created) to the delete button of each
+    let convertPostsToAjax = function(){
+        $('#posts-list-container>ul>li').each(function(){
+            let self = $(this);
+            let deleteButton = $(' .delete-post-button', self);
+            deletePost(deleteButton);
+
+            // get the post's id by splitting the id attribute
+            let postId = self.prop('id').split("-")[1]
+            new PostComments(postId);
+        });
+    }
+
+    createPost();
+    convertPostsToAjax();
+} 
+
+
+125)post_controller=>updated req.xhr in both func
+const Post=require('../models/post');
+const Comment=require('../models/comment');
+module.exports.create=async function(req,res)
+{
+    try{
+        let post=await Post.create({
+            //we have got the post schema above
+            //now can access content,user
+            //here user._id (can refer in robo3t)
+            //req.body.content is bcoz we hv given name of form as content
+            content:req.body.content,
+            user:req.user._id
+        });
+
+        //if the req is in xhml http request i.e via ajax
+        if(req.xhr){
+            // if we want to populate just the name of the user (we'll not want to send the password in the API), this is how we do it!
+            post = await post.populate('user','name');
+            return res.status(200).json({
+                data:{
+                    post:post
+                },
+                message:"Post created!"
+            })
+        }
+
+        req.flash('success','Post published!');
+        return res.redirect('back');
+    }catch(err)
+    {
+        req.flash('error',err);
+        
+        return res.redirect('back');
+    }
+}
+
+//will be deleting according to action=> /posts/destroy/:id
+//in params there would be id of post
+module.exports.destroy=async function(req,res){
+    try{
+        let post=await Post.findById(req.params.id);
+        //.id means converting the object id (._id) to string
+        if(post.user==req.user.id)
+        {
+            post.remove();
+            await Comment.deleteMany({
+                post:req.params.id
+            });
+
+            if(req.xhr)
+            {
+                return res.status(200).json({
+                    data:{
+                        post_id:req.params.id
+                    },
+                    message:"Post Deleted"
+                });
+            }
+
+            req.flash('success','Post and associated comments deleted!')
+            return res.redirect('back');
+        }else{
+            req.flash('error','You cannot delete this post');
+            return res.redirect('back');
+        }
+    }catch(err)
+    {
+        req.flash('error',err);
+        return res.redirect('back');
+    }
+    
+}
+
+126)home.ejs
+<!-- importing this script for creating the comments -->
+<script src="/js/home_post_comments.js" ></script>
+
+127)_comment.ejs=>added ids to li  and class to a tag
+<li id="comment-<%= comment._id %>">
+    <p>
+        <% if (locals.user && locals.user.id == comment.user.id){ %>
+        
+        <small>
+            <a class="delete-comment-button" href="/comments/destroy/<%= comment.id %>">X</a>
+        </small>
+        <% } %>
+        <%= comment.content %>
+        <br>
+        <small>
+            <%= comment.user.name %>
+        </small>
+    </p>    
+</li>
+
+128)comments_controller.js=>req.xhr funcs
+const Comment=require('../models/comment');
+const Post=require('../models/post');
+const User=require('../models/user');
+
+module.exports.create=async function(req,res){
+    try{
+        //req.body.post as we hv given name as post in input with type hidden
+        let post=await Post.findById(req.body.post)
+        if(post)
+        {
+            let comment=await Comment.create({
+                content:req.body.content,
+                post:req.body.post,
+                user:req.user._id
+            });
+            //updating the posts schema as well that is pushing the comment in the comments array
+            post.comments.push(comment);
+            post.save();
+
+            if (req.xhr){
+                // Similar for comments to fetch the user's id!
+                comment = await comment.populate('user','name');
+    
+                return res.status(200).json({
+                    data: {
+                        comment:comment,
+                    },
+                    message: "Post created!"
+                });
+            }
+
+            req.flash('success','Comment added!');
+            res.redirect('/');
+        }
+    }catch(err)
+    {
+        req.flash('error',err);
+        res.redirect('/');
+    }
+}
+
+module.exports.destroy=async function(req,res){
+    try{
+        let comment=await Comment.findById(req.params.id);
+        if(comment.user==req.user.id){
+            //since we also need to delete comment from the comments array of that particular post
+            let postId=comment.post;
+            comment.remove();
+            //update by pull out from comments array the id with req.params.id that is comment id
+            let post=await Post.findByIdAndUpdate(postId,{$pull:{comments:req.params.id}});
+             // send the comment id which was deleted back to the views
+             if (req.xhr){
+                return res.status(200).json({
+                    data: {
+                        comment_id: req.params.id
+                    },
+                    message: "Post deleted"
+                });
+            }
+
+            req.flash('success','Comment deleted!')
+            return res.redirect('back');
+        }
+        else{
+            req.flash('error','You cannot delete this comment');
+            return res.redirect('back');
+        }
+    }catch(err)
+    {
+        req.flash('error',err);
+        return res.redirect('back');
+    }
+}
+
+129)home_post_comments.js in assets js
+// Let's implement this via classes
+
+// this class would be initialized for every post on the page
+// 1. When the page loads
+// 2. Creation of every post dynamically via AJAX
+
+class PostComments{
+    // constructor is used to initialize the instance of the class whenever a new instance is created
+    constructor(postId){
+        this.postId = postId;
+        this.postContainer = $(`#post-${postId}`);
+        this.newCommentForm = $(`#post-${postId}-comments-form`);
+
+        this.createComment(postId);
+
+        let self = this;
+        // call for all the existing comments
+        $(' .delete-comment-button', this.postContainer).each(function(){
+            self.deleteComment($(this));
+        });
+    }
+
+
+    createComment(postId){
+        let pSelf = this;
+        this.newCommentForm.submit(function(e){
+            e.preventDefault();
+            let self = this;
+
+            $.ajax({
+                type: 'post',
+                url: '/comments/create',
+                data: $(self).serialize(),
+                success: function(data){
+                    let newComment = pSelf.newCommentDom(data.data.comment);
+                    $(`#post-comments-${postId}`).prepend(newComment);
+                    pSelf.deleteComment($(' .delete-comment-button', newComment));
+
+                    new Noty({
+                        theme: 'relax',
+                        text: "Comment published!",
+                        type: 'success',
+                        layout: 'topRight',
+                        timeout: 1500
+                        
+                    }).show();
+
+                }, error: function(error){
+                    console.log(error.responseText);
+                }
+            });
+
+
+        });
+    }
+
+
+    newCommentDom(comment){
+        // I've added a class 'delete-comment-button' to the delete comment link and also id to the comment's li
+        return $(`<li id="comment-${ comment._id }">
+                        <p>
+                            
+                            <small>
+                                <a class="delete-comment-button" href="/comments/destroy/${comment._id}">X</a>
+                            </small>
+                            
+                            ${comment.content}
+                            <br>
+                            <small>
+                                ${comment.user.name}
+                            </small>
+                        </p>    
+
+                </li>`);
+    }
+
+
+    deleteComment(deleteLink){
+        $(deleteLink).click(function(e){
+            e.preventDefault();
+
+            $.ajax({
+                type: 'get',
+                url: $(deleteLink).prop('href'),
+                success: function(data){
+                    $(`#comment-${data.data.comment_id}`).remove();
+
+                    new Noty({
+                        theme: 'relax',
+                        text: "Comment Deleted",
+                        type: 'success',
+                        layout: 'topRight',
+                        timeout: 1500
+                        
+                    }).show();
+                },error: function(error){
+                    console.log(error.responseText);
+                }
+            });
+
+        });
+    }
+}
+
+130)starting with file uploading
+npm install multer
+
+131)profile.ejs
+also added enctype="multipart/form-data" to form
+and input for file
+
+
+<% if(user.id==profile_user.id){ %>
+    <!-- if user matches then show the updation form otherwise just show profile info -->
+    <form action="/users/update/<%=profile_user.id%>" method="POST" enctype="multipart/form-data">
+        <input type="text" name="name" placeholder="Your Name" value="<%=profile_user.name%>" required>
+        <input type="email" name="email" placeholder="Your Email" value="<%=profile_user.email%>" required>
+        
+
+        //input type file
+        <input type="file" name="avatar" placeholder="Profile Picture">
+        <input type="submit" value="UPDATE">
+    </form>
+<%}else{%>
+    <p><%= profile_user.name%></p>
+    <p><%= profile_user.email%></p>
+<%}%>
+
+132)user.js in models
+//setting multer not in config but in models as we would require differenetly for post,user,comments
+//we could have a centralised one but this too is a good approach
+const multer=require('multer');
+const path=require('path');
+const AVATAR_PATH=path.join('/uploads/users/avatars');
+
+
+133)user.js in models
+
+created another field in user schema
+
+avatar:{
+    //we would be keeping the path of the place where the image is stored here
+    type:String,
+}
+
+//and
+
+let storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, path.join(__dirname,'..',AVATAR_PATH));
+      //__dirname is currently where we are+..+/uploads/users/avatars
+      // this is the final path
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+      cb(null, file.fieldname + '-' + uniqueSuffix);
+      //here fieldname here is avatar ,the one defined in user schemma
+    }
+});
+
+//static function
+//to connect diskStorage to storage of multer=>the first storage is of multer and second one defined above
+//.single('avatar') means that we can only send one file for particular to avatar not array of files like in post of pics(more than 1)
+userSchema.statics.uploadedAvatar=multer({storage:storage}).single('avatar');
+//want to make AVATAR_PATH public so defining it here so one can use User.avatarPath outside this file
+userSchema.statics.avatarPath=AVATAR_PATH;
+
+134)user_controller.js
+module.exports.update= async function(req,res){
+    // if(req.user.id==req.params.id){
+    //     User.findByIdAndUpdate(req.params.id,req.body,function(err,User){
+    //         req.flash('success','Profile Updated successfully!'); 
+    //         return res.redirect('back');
+    //     });
+    // }else{
+    //     //if someone tries to fiddle by inspect nd then change id then show http 401 unauthorized part
+    //     return res.status(401).send('Unauthorized');
+    // }
+
+
+    if(req.user.id==req.params.id){
+        try{
+            let user=await User.findById(req.params.id);
+            User.uploadedAvatar(req,res,function(err){
+                if(err){console.log('*****Multer Error',err);}
+                // console.log(req.file);
+                //could not ready body of req without multer as form encytype is multipart
+                user.name=req.body.name;
+                user.email=req.body.email;
+                if(req.file){
+                    //if user already has a file before then delete the previous one and save the new one, making storage efficient
+                    if(user.avatar){
+                        fs.unlinkSync(path.join(__dirname,'..',user.avatar));
+                    }
+                    
+                    //this is saving the path of the uploaded file into the avatar field in the user
+                    user.avatar=User.avatarPath+'/'+req.file.filename;
+                }
+                user.save();
+                return res.redirect('back');
+            })
+
+        }catch(err)
+        {
+            req.flash('error',err);
+            return res.redirect('back');
+        }
+    }else{
+        //if someone tries to fiddle by inspect nd then change id then show http 401 unauthorized part
+        req.flash('error','Unauthorized!');
+        return res.status(401).send('Unauthorized');
+    }
+}
+
+135)profile.ejs
+<img src="<%=user.avatar%>" alt="<%=user.name%>" width="100">
+
+
+136)index.js
+//make the uploads path available to the browser
+app.use('/uploads',express.static(__dirname+'/uploads'));
+
+
+137)profile.ejs
+added preview of apic while uploading 
+<!-- whatever u write here will be rendered to body of the layout -->
+<link rel="stylesheet" href="/css/user_profile.css">
+
+<img src="<%=user.avatar%>" alt="<%=user.name%>" width="100" id="profile_pic">
+
+<!-- user available bcoz we made res.locals.user=req.user in passport.js -->
+<!-- <p><%= user.name%></p>
+<p><%= user.email%></p> -->
+
+
+<% if(user.id==profile_user.id){ %>
+    <!-- if user matches then show the updation form otherwise just show profile info -->
+    <form action="/users/update/<%=profile_user.id%>" method="POST" enctype="multipart/form-data"  >
+        <input type="text" name="name" placeholder="Your Name" value="<%=profile_user.name%>" required>
+        <input type="email" name="email" placeholder="Your Email" value="<%=profile_user.email%>" required>
+        
+        <input type="file" name="avatar" placeholder="Profile Picture" id="inpFile">
+        <input type="submit" value="UPDATE">
+    </form>
+<%}else{%>
+    <p><%= profile_user.name%></p>
+    <p><%= profile_user.email%></p>
+<%}%>
+
+<script>
+    //for preview of file before upload
+    const inpFile=document.getElementById('inpFile');
+    const profile_pic=document.getElementById('profile_pic');
+    inpFile.addEventListener("change",function(){
+        const file=this.files[0];
+        if(file)
+        {
+            // console.log("hello");
+            const reader=new FileReader();
+            reader.addEventListener("load",function(){
+                profile_pic.setAttribute("src",this.result);
+            });
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+138)index.js routes
+router.use('/api',require('./api'));
+
+139)index.js in api in routes
+const express=require('express');
+const router=express.Router();
+
+module.exports=router;

@@ -1,0 +1,43 @@
+header{
+    display: flex;
+    justify-content: space-between;
+    height: 75px;
+    background-color: rgb(59, 50, 219);
+    #auth{
+        margin-right: 3%;
+        width: auto;
+        display: flex;
+        align-items: center;
+        ul li{
+            list-style: none;
+            text-decoration: none;
+            display: inline-block;
+            padding: 0.3rem;
+            a{
+                color: aliceblue;
+                text-decoration: none;
+                font-weight: 500;
+                font-size: 1rem;
+                letter-spacing: 0.5px;
+                font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            }
+        }
+    }
+    #logo{
+        margin-left: 3%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        p{
+            font-weight: 700;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            .symb{
+                color: rgb(227, 247, 6);
+                margin-right: 0.5rem;
+            }
+        }
+    }
+}
