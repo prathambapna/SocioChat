@@ -2410,5 +2410,27 @@ router.use('/api',require('./api'));
 139)index.js in api in routes
 const express=require('express');
 const router=express.Router();
+router.use('/v1',require('./v1'));
+module.exports=router;
+
+140)index.js in v1 in api in routes
+const express=require('express');
+const router=express.Router();
+router.use('/posts',require('./posts'));
+module.exports=router;
+
+141)posts.js in v1 in api in routes
+const express=require('express');
+const router=express.Router();
+const postsApi=require("../../../controllers/api/v1/posts_api");
+router.get('/',postsApi.index);
 
 module.exports=router;
+
+142)posts_api.js in v1 in api in controllers
+module.exports.index=function(req,res){
+    return res.json(200,{
+        message:"List of Posts",
+        posts:[]
+    })
+}
