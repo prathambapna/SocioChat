@@ -1,0 +1,23 @@
+{
+  "name": "gosocial",
+  "version": "1.0.0",
+  "description": "\"A social media platform\"",
+  "main": "index.js",
+  "scripts": {
+    "start":"nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/prathambapna/goSocial.git"
+  },
+  "author": "Pratham Bapna",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/prathambapna/goSocial/issues"
+  },
+  "homepage": "https://github.com/prathambapna/goSocial#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
