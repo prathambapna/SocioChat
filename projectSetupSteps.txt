@@ -2493,7 +2493,7 @@ const User=require('../models/user');
 
 let opts={
     //extract from bearer inside authorization inside header
-    jwtFromRequest:ExtractJWT.fromAuthHeaderAsBearerToken,
+    jwtFromRequest:ExtractJWT.fromAuthHeaderAsBearerToken(),
     //key to encrypt
     secretOrKey:'codeial',
 }
@@ -2517,3 +2517,83 @@ passport.use(new JWTStrategy(opts,function(jwtPayLoad,done){
 }));
 
 module.exports=passport;
+
+148)creating our own token for apis
+npm install jsonwebtoken
+
+149)users_api.js in v1 in api in controller
+//creating token for user signing in using api
+
+const User=require('../../../models/user');
+const jwt=require('jsonwebtoken');
+module.exports.createSession=async function(req,res)
+{
+    try {
+        let user=await User.findOne({email:req.body.email});
+        if(!user || user.password!=req.body.password){
+            return res.status(422).json({
+                message:'Invalid username or password'
+            })
+        }
+        return res.status(200).json({
+            message:'Sign in successful, here is your token , please keep it safe!',
+            data:{
+                token:jwt.sign(user.toJSON(),'codeial',{expiresIn:1000000})
+            }
+        })
+
+    } catch (err) {
+        return res.status(500).json({
+            message:"Internal Server Error"
+        });
+    }
+} 
+
+150)users.js in v1 in api in routes
+const express=require('express');
+const router=express.Router();
+const usersApi=require('../../../controllers/api/v1/users_api');
+router.post('/create-session',usersApi.createSession);
+module.exports=router;
+
+151)index.js in v1 in api in routes
+router.use('/users',require('./users'));
+
+152)posts.js in v1 in api in route
+
+const express=require('express');
+const router=express.Router();
+const passport=require('passport');
+const postsApi=require("../../../controllers/api/v1/posts_api");
+router.get('/',postsApi.index);
+
+//strategy would be jwt, session:false =>do not want session cookies to be generated
+router.delete('/:id',passport.authenticate('jwt',{session:false}),postsApi.destroy);
+module.exports=router;
+
+153)posts_api.js in v1 in api in controllers
+//updated with user id check
+
+module.exports.destroy=async function(req,res){
+    try{
+        let post=await Post.findById(req.params.id);
+        if(post.user==req.user.id){
+            post.remove();
+            await Comment.deleteMany({
+                post:req.params.id
+            });
+            return res.status(200).json({
+                message:"Post and associated comments deleted successfully"
+            });
+        }else{
+            return res.status(401).json({
+                message:"You cannot delete this post"
+            });
+        }
+    }catch(err)
+    {
+        return res.status(500).json({
+            message:"Internal Server Error"
+        });  
+     }
+}

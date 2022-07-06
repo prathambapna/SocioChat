@@ -5,7 +5,7 @@ const User=require('../models/user');
 
 let opts={
     //extract from bearer inside authorization inside header
-    jwtFromRequest:ExtractJWT.fromAuthHeaderAsBearerToken,
+    jwtFromRequest:ExtractJWT.fromAuthHeaderAsBearerToken(),
     //key to encrypt
     secretOrKey:'codeial',
 }
