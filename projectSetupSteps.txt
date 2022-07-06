@@ -2597,3 +2597,85 @@ module.exports.destroy=async function(req,res){
         });  
      }
 }
+
+154)starting with google auth
+search on google=> console.developers.com
+create project =>(we have name project as Codeial)
+go to credentials ,create credential
+do auth consent screen verification
+then
+back to create credentials
+authorized javascript origin
+http://localhost:8000
+
+authorized redirect uris
+http://localhost:8000/users/auth/google/callback
+
+u get client id and client secret
+
+155)terminal
+npm install passport-google-oauth
+npm install crypto
+
+
+156)passport-google-oauth2-strategy.js
+
+const passport=require('passport');
+const googleStrategy=require('passport-google-oauth').OAuth2Strategy;
+const crypto=require('crypto');
+const User=require('../models/user');
+
+
+//tell passport to use a new strategy for google login
+passport.use(new googleStrategy({
+        //below info get from console.developers.com =>go to codeial project created
+        clientID:"399691637146-fg31phq30hvpkh9qjijdicb79j59urle.apps.googleusercontent.com",
+        clientSecret:"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",
+        callbackURL:"http://localhost:8000/users/auth/google/callback",
+    },
+    function(accessToken,refreshToken,profile,done){
+        //find a user
+        User.findOne({email:profile.emails[0].value}).exec(function(err,user){
+            if(err){
+                console.log('error in google strategy passport',err);
+                return;
+            }
+            console.log(profile);
+            if(user){
+                //if found then set this user as req.user
+                return done(null,user);
+            }else{
+                //if user not found then signup i.e create the user and set it as req.user
+                User.create({
+                    name:profile.displayName,
+                    email:profile.emails[0].value,
+                    password:crypto.randomBytes(20).toString('hex'),
+                },function(err,user){
+                    if(err){
+                        console.log('error in creating user  google strategy passport',err);
+                        return;
+                    }
+                    else{
+                        return done(null,user);
+                    }
+                })
+            }
+        })
+    }
+));
+
+module.exports=passport;
+
+157)users.js in routes
+//the one below is automatically understood by passport-google(as given in documentation)
+router.get('/auth/google',passport.authenticate('google',{scope:['profile','email']}));
+//this is the callback route
+router.get('/auth/google/callback',passport.authenticate('google',{failureRedirect:'/users/sign-in'}),usersController.createSession);
+
+158)index.js
+const passportGoogle=require('./config/passport-google-oauth2-strategy');
+
+159)user_sign_in.js and user_sign_up.js in views
+<p>
+    <a href="/users/auth/google">Google Sign In/Sign Up</a>
+</p>   

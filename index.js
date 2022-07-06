@@ -10,6 +10,7 @@ const session=require('express-session');
 const passport=require('passport');
 const passportLocal=require('./config/passport-local-strategy');
 const passportJWT=require('./config/passport-jwt-strategy');
+const passportGoogle=require('./config/passport-google-oauth2-strategy');
 
 //using mongostore to store the session cookies so that after every restart of server user does not gets logged out
 const MongoStore= require('connect-mongo');
