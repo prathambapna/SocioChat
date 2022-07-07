@@ -2785,3 +2785,10 @@ exports.newComment=(comment)=>{
     <p>Your comment <strong><%=comment.content%></strong> just got published on codeial</p>
     <p>Thanks! </p>
 </div>
+
+166)starting with delayed jobs
+npm install kue
+
+167)//Redis
+
+168)
