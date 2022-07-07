@@ -3,6 +3,8 @@ const User=require('../models/user');
 const fs=require('fs');
 const path=require('path');
 
+       
+
 //not need to change to async await as only one callback
 module.exports.profile=function(req,res){
     User.findById(req.params.id,function(err,user){
