@@ -2697,7 +2697,8 @@ let transporter=nodemailer.createTransport({
     secure:false,
     auth:{
         user:'codeialapplication@gmail.com',
-        pass:'Codeial1234'
+        //go to this email =>security=>do 2 step verification=>then app password=>then for mail for windows computer=>generate password=>use that password here 
+        pass:'utfmapramalrfgzv'
     }
 });
 
@@ -2721,4 +2722,66 @@ module.exports={
     renderTemplate:renderTemplate
 }
 
-162)
+162)comments_mailer.js in mailers
+const nodeMailer=require('../config/nodemailer');
+
+
+//this is another way of exporting a method instead of module.exports just to be familiar with this too
+exports.newComment=(comment)=>{
+    console.log('inside newcomment mailer');
+    nodeMailer.transporter.sendMail({
+        from:"codeialapplication@gmail.com",
+        to:comment.user.email,
+        subject:"New Comment Published",
+        html:'<h1>YUP,your comment is published! </h1>'
+    },(err,info)=>{
+        if(err)
+        {
+            console.log('error in sending mail',err);
+            return;
+        }
+        console.log('message sent',info);
+        return;
+    });
+}
+
+163)comments_controller
+inside create function(check this in the file)
+
+//since we would be requiring name and email of user at various places
+//like user.email 
+comment = await comment.populate('user','name email');
+commentsMailer.newComment(comment);
+
+164)comments_mailer.js
+//changed html part now using template
+
+const nodeMailer=require('../config/nodemailer');
+//this is another way of exporting a method instead of module.exports just to be familiar with this too
+exports.newComment=(comment)=>{
+    let htmlString=nodeMailer.renderTemplate({
+        comment:comment
+    },'/comments/new_comment.ejs');
+    nodeMailer.transporter.sendMail({
+        from:"codeialapplication@gmail.com",
+        to:comment.user.email,
+        subject:"New Comment Published",
+        html:htmlString
+    },(err,info)=>{
+        if(err)
+        {
+            console.log('error in sending mail',err);
+            return;
+        }
+        console.log('message sent',info);
+        return;
+    });
+}
+
+
+165)new_comment.ejs in comments in  mailers in views
+<div>
+    <p>Hi <%=comment.user.name%>!</p>
+    <p>Your comment <strong><%=comment.content%></strong> just got published on codeial</p>
+    <p>Thanks! </p>
+</div>

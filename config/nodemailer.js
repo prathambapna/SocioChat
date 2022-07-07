@@ -11,7 +11,8 @@ let transporter=nodemailer.createTransport({
     secure:false,
     auth:{
         user:'codeialapplication@gmail.com',
-        pass:'Codeial1234'
+        //go to this email =>security=>do 2 step verification=>then app password=>then for mail for windows computer=>generate password=>use that password here 
+        pass:'utfmapramalrfgzv'
     }
 });
 
