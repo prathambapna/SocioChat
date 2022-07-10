@@ -57,8 +57,13 @@ module.exports.home= async function(req,res)
             path:'comments',//as we have name the array in post schema as comments
             populate:{
                 path:'user'//name the user in post schema as user
+            },
+            //populate the likes of each post and comment
+            populate: {
+                path: 'likes'
             }
-        });
+        }).populate('comments')
+        .populate('likes');
 
         let users=await User.find({});
 

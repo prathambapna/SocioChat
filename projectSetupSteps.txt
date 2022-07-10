@@ -2791,4 +2791,517 @@ npm install kue
 
 167)//Redis
 
-168)
+168)like.js in model
+const mongoose=require('mongoose');
+const likeSchema=new mongoose.Schema({
+    user:{
+        type:mongoose.Schema.Types.ObjectId,
+    },
+    //this defines the object id of the liked object
+    likeable:{
+        type:mongoose.Schema.Types.ObjectId,
+        required:true,
+        refPath:'onModel'
+    },
+    //this field is used for defining the type of liked object since this is a dynamic reference
+    onModel:{
+        type:String,
+        required:true,
+        enum:['Post','Comment']
+    }
+},{
+    timestamps:true
+});
+
+const Like=mongoose.model('Like',likeSchema);
+module.exports=Like; 
+
+
+169)updating comment.js and post.js in model in schema
+likes:[
+        {
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'Like'
+        }
+    ]
+
+170)index.js in routes
+router.use('/likes',require('./likes'));
+
+171)like.js in routes
+const express=require('express');
+const router=express.Router();
+const LikesController=require('../controllers/likes_controller');
+
+router.post('/toggle',LikesController.toggleLike);
+module.exports=router;
+
+
+172)likes_controller.js
+const Like=require('../models/like');
+const Post=require('../models/post');
+const Comment=require('../models/comment');
+
+module.exports.toggleLike=async function(req,res){
+    try {
+        //likes/toggle/?id=abcded&type=Post
+        let likeable;
+        let deleted=false;
+        if(req.query.type=='Post')
+        {
+            likeable=await Post.findById(req.query.id).populate('likes');
+        }
+        else{
+            likeable=await Comment.findById(req.query.id).populate('likes');
+        }
+
+        //check if like already exits
+        let existingLike=await Like.findOne({
+            likeable:req.query.id,
+            onModel:req.query.type,
+            user:req.user._id
+        })
+
+
+        //if a like already exists delete it
+        if(existingLike){
+            likeable.likes.pull(existingLike._id);
+            likeable.save();
+            existingLike.remove();
+            deleted:true;
+        }
+        //add like
+        else{
+            let newLike=await Like.create({
+                user:req.user._id,
+                likeable:req.query._id,
+                onModel:req.query.type
+            });
+            likeable.likes.push(newLike._id);
+            likeable.save();
+        }
+        return res.json(200,{
+            message:"Request successful!",
+            data:{
+                deleted:deleted
+            }
+        })
+    } catch (err){
+        console.log(err);
+        return res.json(500,{
+            message:'Internal server error'
+        });
+    }
+}
+
+173)home_controller.js
+//populated likes in each post and comment
+
+module.exports.home= async function(req,res)
+{
+    try{
+        let posts=await Post.find({})
+        .sort('-createdAt')//sort acc to time of creation=>latest one showimg first
+        .populate('user')
+        .populate({
+            path:'comments',//as we have name the array in post schema as comments
+            populate:{
+                path:'user'//name the user in post schema as user
+            },
+            //populate the likes of each post and comment
+            populate: {
+                path: 'likes'
+            }
+        }).populate('comments')
+        .populate('likes');
+
+        let users=await User.find({});
+
+        return res.render('home',{
+            title:'Codeial | Home',
+            posts:posts,
+            all_users:users
+        });
+    }catch(err){
+        console.log('Error',err);
+        return; 
+    }
+}
+
+174)post_controller.js
+// CHANGE :: delete the associated likes for the post and all its comments' likes too
+module.exports.destroy=async function(req,res){
+    try{
+        let post=await Post.findById(req.params.id);
+        //.id means converting the object id (._id) to string
+        if(post.user==req.user.id)
+        {
+
+            // CHANGE :: delete the associated likes for the post and all its comments' likes too
+            await Like.deleteMany({likeable: post, onModel: 'Post'});
+            await Like.deleteMany({_id: {$in: post.comments}});
+
+
+            post.remove();
+            await Comment.deleteMany({
+                post:req.params.id
+            });
+
+            if(req.xhr)
+            {
+                return res.status(200).json({
+                    data:{
+                        post_id:req.params.id
+                    },
+                    message:"Post Deleted"
+                });
+            }
+
+            req.flash('success','Post and associated comments deleted!')
+            return res.redirect('back');
+        }else{
+            req.flash('error','You cannot delete this post');
+            return res.redirect('back');
+        }
+    }catch(err)
+    {
+        req.flash('error',err);
+        return res.redirect('back');
+    }
+    
+}
+
+175)comments_controller.js
+in module.exports.destroy
+
+// CHANGE :: destroy the associated likes for this comment
+await Like.deleteMany({likeable: comment._id, onModel: 'Comment'});
+
+176)_post.ejs
+(check where it has been added)
+<!-- CHANGE :: display the likes of this post, if the user is logged in, then show the link to toggle likes, else, just show the count -->
+<br>
+    <!-- study about the data attribute -->
+<small>
+    <% if (locals.user){ %>
+        <a class="toggle-like-button" data-likes="<%= post.likes.length %>" href="/likes/toggle/?id=<%=post._id%>&type=Post">
+                <%= post.likes.length %> Likes
+        </a>
+    <% }else{ %>
+        <%= post.likes.length %> Likes
+    <% } %>
+</small>
+
+177)_comment.ejs
+<!-- CHANGE :: display the likes of this comment, if the user is logged in, then show the link to toggle likes, else, just show the count -->
+<!-- study about the data attribute -->
+<small>
+    <% if (locals.user){ %>
+        <a class="toggle-like-button" data-likes="<%= comment.likes.length %>" href="/likes/toggle/?id=<%=comment._id%>&type=Comment">
+                <%= comment.likes.length %> Likes
+        </a>
+    <% }else{ %>
+        <%= comment.likes.length %> Likes
+    <% } %>
+</small>
+
+
+178)home_posts.js in js in assets
+{
+    //method to submit the form data for new post using ajax
+   let createPost=function(){
+       //getting form from home.ejs id
+       let newPostForm=$('#new-post-form');
+       //preventing default action of submit as we need to submit through ajax
+       newPostForm.submit(function(e){
+           e.preventDefault();
+           //now submitting through ajax
+           $.ajax({
+               type:'post',
+               url:'/posts/create',
+               //converts post data into json like content becomes key and value is the one entered
+               data:newPostForm.serialize(),
+               success:function(data){
+                   // console.log(data);
+                   //data.data.post can be seen as when we learnt api ,u can console log data on that u can see data in that post
+                   let newPost=newPostDom(data.data.post);
+                   $('#posts-list-container>ul').prepend(newPost);
+                   deletePost($(' .delete-post-button',newPost));//space before class name here to adjust newPost
+                   
+                    // call the create comment class
+                    new PostComments(data.data.post._id);
+
+                    // CHANGE :: enable the functionality of the toggle like button on the new post
+                    new ToggleLike($(' .toggle-like-button', newPost));
+
+                   new Noty({
+                       theme: 'relax',
+                       text: "Post published!",
+                       type: 'success',
+                       layout: 'topRight',
+                       timeout: 1500
+                       
+                   }).show();
+
+               },error:function(error){
+                   console.log(error.responseText);
+               }
+           });
+       });
+   }
+
+   //method to create a post in dom
+   let newPostDom=function(post){
+       //copied from _post.ejs and removed unnecessary checks
+      // CHANGE :: show the count of zero likes on this post
+        return $(`<li id="post-${post._id}">
+        <p>
+            
+            <small>
+                <a class="delete-post-button"  href="/posts/destroy/${ post._id }">X</a>
+            </small>
+            
+            ${ post.content }
+            <br>
+            <small>
+            ${ post.user.name }
+            </small>
+            <br>
+            <small>
+                    <a class="toggle-like-button" data-likes="0" href="/likes/toggle/?id=${post._id}&type=Post">
+                        0 Likes
+                    </a>
+                
+            </small>
+
+        </p>
+        <div class="post-comments">
+            <form id="post-${ post._id }-comments-form" action="/comments/create" method="POST">
+                <input type="text" name="content" placeholder="Type Here to add comment..." required>
+                <input type="hidden" name="post" value="${post._id}" >
+                <input type="submit" value="Add Comment">
+            </form>
+
+            <div class="post-comments-list">
+                <ul id="post-comments-${post._id}"> 
+                </ul>
+            </div>
+        </div>
+    </li>
+       `)
+   }
+
+   //method to delete a post from dom using ajax
+   let deletePost=function(deleteLink){
+       $(deleteLink).click(function(e){
+           e.preventDefault();
+
+           $.ajax({
+               type:'get',
+               url:$(deleteLink).prop('href'),//get href part from a tag , that is we hv passed a tag as deletelink
+               success:function(data){
+                   $(`#post-${data.data.post_id}`).remove();
+                   new Noty({
+                       theme: 'relax',
+                       text: "Post Deleted",
+                       type: 'success',
+                       layout: 'topRight',
+                       timeout: 1500
+                       
+                   }).show();
+
+               },error:function(error){
+                   console.log(error.responseText);
+               }
+           });
+       });
+   }
+
+   // loop over all the existing posts on the page (when the window loads for the first time) and call the delete post method on delete link of each, also add AJAX (using the class we've created) to the delete button of each
+   let convertPostsToAjax = function(){
+       $('#posts-list-container>ul>li').each(function(){
+           let self = $(this);
+           let deleteButton = $(' .delete-post-button', self);
+           deletePost(deleteButton);
+
+           // get the post's id by splitting the id attribute
+           let postId = self.prop('id').split("-")[1]
+           new PostComments(postId);
+       });
+   }
+
+   createPost();
+   convertPostsToAjax();
+} 
+
+
+179)home_post_comments.js in js in assets
+// Let's implement this via classes
+
+// this class would be initialized for every post on the page
+// 1. When the page loads
+// 2. Creation of every post dynamically via AJAX
+
+class PostComments{
+    // constructor is used to initialize the instance of the class whenever a new instance is created
+    constructor(postId){
+        this.postId = postId;
+        this.postContainer = $(`#post-${postId}`);
+        this.newCommentForm = $(`#post-${postId}-comments-form`);
+
+        this.createComment(postId);
+
+        let self = this;
+        // call for all the existing comments
+        $(' .delete-comment-button', this.postContainer).each(function(){
+            self.deleteComment($(this));
+        });
+    }
+
+
+    createComment(postId){
+        let pSelf = this;
+        this.newCommentForm.submit(function(e){
+            e.preventDefault();
+            let self = this;
+
+            $.ajax({
+                type: 'post',
+                url: '/comments/create',
+                data: $(self).serialize(),
+                success: function(data){
+                    let newComment = pSelf.newCommentDom(data.data.comment);
+                    $(`#post-comments-${postId}`).prepend(newComment);
+                    pSelf.deleteComment($(' .delete-comment-button', newComment));
+                    
+                    // CHANGE :: enable the functionality of the toggle like button on the new comment
+                    new ToggleLike($(' .toggle-like-button', newComment));
+
+                    new Noty({
+                        theme: 'relax',
+                        text: "Comment published!",
+                        type: 'success',
+                        layout: 'topRight',
+                        timeout: 1500
+                        
+                    }).show();
+
+                }, error: function(error){
+                    console.log(error.responseText);
+                }
+            });
+
+
+        });
+    }
+
+
+    newCommentDom(comment){
+        // I've added a class 'delete-comment-button' to the delete comment link and also id to the comment's li
+        // CHANGE :: show the count of zero likes on this comment
+
+    return $(`<li id="comment-${ comment._id }">
+                <p>
+                    
+                    <small>
+                        <a class="delete-comment-button" href="/comments/destroy/${comment._id}">X</a>
+                    </small>
+                    
+                    ${comment.content}
+                    <br>
+                    <small>
+                        ${comment.user.name}
+                    </small>
+                    <small>
+                    
+                        <a class="toggle-like-button" data-likes="0" href="/likes/toggle/?id=${comment._id}&type=Comment">
+                            0 Likes
+                        </a>
+                    
+                    </small>
+
+                </p>    
+
+            </li>`);
+    }
+
+
+    deleteComment(deleteLink){
+        $(deleteLink).click(function(e){
+            e.preventDefault();
+
+            $.ajax({
+                type: 'get',
+                url: $(deleteLink).prop('href'),
+                success: function(data){
+                    $(`#comment-${data.data.comment_id}`).remove();
+
+                    new Noty({
+                        theme: 'relax',
+                        text: "Comment Deleted",
+                        type: 'success',
+                        layout: 'topRight',
+                        timeout: 1500
+                        
+                    }).show();
+                },error: function(error){
+                    console.log(error.responseText);
+                }
+            });
+
+        });
+    }
+}
+
+180)home.ejs in views
+<!-- CHANGE :: import the script file for toggle likes, also run it over for the already present posts and comments on the page -->
+<script src="js/toggle_likes.js"></script>
+<script>
+    $('.toggle-like-button').each(function(){
+        let self = this;
+        let toggleLike = new ToggleLike(self);
+    });
+</script>
+
+
+181)toggle_likes.js in js in assets
+
+// CHANGE :: create a class to toggle likes when a link is clicked, using AJAX
+class ToggleLike{
+    constructor(toggleElement){
+        this.toggler = toggleElement;
+        this.toggleLike();
+    }
+
+
+    toggleLike(){
+        $(this.toggler).click(function(e){
+            e.preventDefault();
+            let self = this;
+
+            // this is a new way of writing ajax which you might've studied, it looks like the same as promises
+            $.ajax({
+                type: 'POST',
+                url: $(self).attr('href'),
+            })
+            .done(function(data) {
+                let likesCount = parseInt($(self).attr('data-likes'));
+                console.log(likesCount);
+                if (data.data.deleted == true){
+                    likesCount -= 1;
+                    
+                }else{
+                    likesCount += 1;
+                }
+
+
+                $(self).attr('data-likes', likesCount);
+                $(self).html(`${likesCount} Likes`);
+
+            })
+            .fail(function(errData) {
+                console.log('error in completing the request');
+            });
+        });
+    }
+}
