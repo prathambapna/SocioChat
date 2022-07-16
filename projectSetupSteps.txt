@@ -2868,13 +2868,13 @@ module.exports.toggleLike=async function(req,res){
             likeable.likes.pull(existingLike._id);
             likeable.save();
             existingLike.remove();
-            deleted:true;
+            deleted=true;
         }
         //add like
         else{
             let newLike=await Like.create({
                 user:req.user._id,
-                likeable:req.query._id,
+                likeable:req.query.id,
                 onModel:req.query.type
             });
             likeable.likes.push(newLike._id);
@@ -3305,3 +3305,189 @@ class ToggleLike{
         });
     }
 }
+
+182)_chat_box.ejs
+<%if(locals.user){%>
+    <div id="user-chat-box">
+        <ul id="chat-messages-list">
+            <li class="other-message">
+                <span>Other Message</span>
+            </li>
+            <li class="self-message">
+                <span>Self Message</span>
+            </li>
+        </ul>
+        <div id="chat-message-input-container">
+            <input type="chat-message-input" placeholder="Type message here..">
+            <button id="send-message">Send</button>
+        </div>
+    </div>
+<%}%>
+
+183)chat_box.scss
+// CHANGE :: add styling for the chat box
+#user-chat-box{
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    border: 1px dashed grey;
+    height: 350px;
+	width: 300px;
+	background: white;
+	padding: 5px;
+	box-shadow: 1px 1px 1px 1px lightgrey;
+
+    #chat-messages-list{
+    	list-style: none;
+	    padding: 10px;
+	    height: 70%;
+	    background-color: white;
+	    overflow: auto;
+
+	    .other-message{
+		    text-align: left;
+		    padding: 5px;
+		    span{
+		    	display: inline-block;
+	    		padding: 15px;
+		    	background-color: #ffa0a0;
+		    }
+		    
+	    }
+
+	    .self-message{
+		    text-align: right;
+		    padding: 5px;
+		   
+		    span{
+		    	 
+	    		display: inline-block;
+	    		padding: 15px;
+    			background-color: #a0dcff;
+		    }
+		   
+	    }
+
+    }
+    #chat-message-input-container{
+    	    // height: 24%;
+		    width: 100%;
+		    display: flex;
+		    flex-direction: row;
+
+		    #chat-message-input{
+	    	    height: 30%;
+    			width: 70%;
+		    }
+
+		    #send-message{
+	    	    height: 50%;
+			    width: 30%;
+			    font-size: 25px;
+			    color: white;
+			    border: none;
+			    background: #58d258;
+		    }
+	    }
+}
+
+
+184)home.ejs
+<link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/chat_box.css">
+<div id="home-container">
+    <section id="feed-posts">
+        <h2>Posts</h2>
+        <!-- only if user is signed in view post input area -->
+        <%if(locals.user){%>
+            <form action="/posts/create" id="new-post-form" method="POST">
+                <textarea name="content" cols="30" rows="3" placeholder="Type Here..." required></textarea>
+                <input type="submit" value="Post">
+            </form>
+        <%}%>
+        <div id="posts-list-container">
+            <ul>
+                <%for(post of posts){%>
+                    <%- include('_post') -%>
+            <%}%>
+            </ul>
+        </div>
+    </section>
+    
+    <section id="user-friends">
+        <h4>Friends</h4>
+        <% for(u of all_users){%>
+            <p>
+                <a href="/users/profile/<%=u.id%>"><%= u.name%></a>
+            </p>
+        <%}%>
+    </section>
+    <%- include('_chat_box') -%>
+</div>
+
+<!-- importing this script for creating the comments -->
+<script src="/js/home_post_comments.js" ></script>
+<script src="/js/home_posts.js"></script>
+
+<!-- CHANGE :: import the script file for toggle likes, also run it over for the already present posts and comments on the page -->
+<script src="js/toggle_likes.js"></script>
+<script>
+    $('.toggle-like-button').each(function(){
+        let self = this;
+        let toggleLike = new ToggleLike(self);
+    });
+</script>
+
+185)npm install socket.io
+
+186)home.ejs
+<!-- from https://cdnjs.com/libraries/socket.io -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.5.0/socket.io.js"></script>
+<script src="/js/chat_engine.js"></script>
+
+187)index.js
+//setup chat server to be used with socket.io
+const chatServer=require('http').Server(app);
+const chatSockets=require('./config/chat_sockets').chatSockets(chatServer);
+chatServer.listen(5000);
+console.log('chat server is listening on port 5000');
+
+188)chat_engine.js in js in assets
+class ChatEngine{
+    constructor(chatBoxId,userEmail){
+        this.chatBox=$(`#${chatBoxId}`);
+        this.userEmail=userEmail;
+
+        this.socket=io.connect('http://localhost:5000');
+
+        if(this.userEmail){
+            this.connectionHandler();
+        }
+    }
+
+    connectionHandler(){
+        this.socket.on('connect',function(){
+            console.log('connection established using sockets...!');
+        });
+    }
+}
+
+189)chat_sockets.js in config
+module.exports.chatSockets=function(socketServer){
+    let io=require('socket.io')(socketServer);
+
+    io.sockets.on('connection',function(socket){
+        console.log('new connection received ',socket.id);
+
+        socket.on('disconnect',function(){
+            console.log('socket disconnected!');
+        });
+    });
+}
+
+190)home.ejs
+<% if(locals.user){%>
+    <script >
+        new ChatEngine('user-chat-box','<%= locals.user._id %>');
+    </script>
+<%}%>
