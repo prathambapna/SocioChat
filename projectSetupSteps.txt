@@ -3639,4 +3639,111 @@ module.exports.chatSockets=function(socketServer){
     });
 }
 
-195)
+*******starting with deployment(gulp)*******
+
+195)environment.js in config
+const development={
+    name:'development',
+    asset_path:'/assets',
+    session_cookie_key:'blahsomething',
+    db:'goSocial_development',
+    smtp:{
+        service:'gmail',
+        //go to gmail smtp settings on google
+        //from there get the host for gmail,port:587 is for tls (transport layer secure )
+        host:'smtp.gmail.com',
+        port:587,
+        secure:false,
+        auth:{
+            user:'codeialapplication@gmail.com',
+            //go to this email =>security=>do 2 step verification=>then app password=>then for mail for windows computer=>generate password=>use that password here 
+            pass:'utfmapramalrfgzv'
+        }
+    },
+    google_client_id:"399691637146-fg31phq30hvpkh9qjijdicb79j59urle.apps.googleusercontent.com",
+    google_client_secret:"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",
+    google_call_back_url:"ht tp://localhost:8000/users/auth/google/callback",
+    jwt_secret:'codeial',
+}
+
+const production={
+    name:'production'
+}
+
+module.exports=development;
+
+
+196)index.js
+const env=require('./config/environment');
+
+const path=require('path');
+app.use(sassMiddleware({
+    src:path.join(__dirname,env.asset_path,'/scss'),
+    dest:path.join(__dirname,env.asset_path,'/css'),
+    debug:true,
+    outputStyle:'extended',
+    prefix:'/css'
+}))
+
+app.use(express.static(env.asset_path));
+
+app.use(session({
+    name:'goSocial',
+    //todo the secret before deployment in production mode
+    //changed the secret part 
+    secret:env.session_cookie_key,
+    saveUninitialized:false,
+    resave:false,
+    cookie:{
+        maxAge:(1000*60*100)
+        //100 min =>1000 millisec,60sec
+    },
+    store:MongoStore.create({
+        //got this url from mongodb atlas application
+        mongoUrl:'mongodb://localhost:27017',
+        autoRemove:'disabled'
+    },function(err)
+    {
+        console.log(err || 'connect-mongo-db setup ok');
+    })
+}))
+
+
+197)mongoose.js in config
+const env=require('./environment');
+mongoose.connect(`mongodb://localhost/${env.db}`);
+
+198)nodemailer.js in config
+const env=require('./environment');
+let transporter=nodemailer.createTransport(env.smtp);
+
+199)passport-jwt-strategy.js
+const env=require('./environment');
+
+let opts={
+    //extract from bearer inside authorization inside header
+    jwtFromRequest:ExtractJWT.fromAuthHeaderAsBearerToken(),
+    //key to encrypt
+    secretOrKey:env.jwt_secret,
+}
+
+200)passport-google-auth.js in config
+const env=require('./environment');
+
+//tell passport to use a new strategy for google login
+passport.use(new googleStrategy({
+        //below info get from console.developers.com =>go to codeial project created
+        clientID:env.google_client_id,
+        clientSecret:env.google_client_secret,
+        callbackURL:env.google_call_back_url,
+    },
+*************rest same as before************
+
+
+201)user_api in v1 in api in controllers
+const env=require('./environment');
+data:{
+    token:jwt.sign(user.toJSON(),env.jwt_secret,{expiresIn:1000000})
+}
+
+202)

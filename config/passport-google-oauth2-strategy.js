@@ -4,14 +4,14 @@ const passport=require('passport');
 const googleStrategy=require('passport-google-oauth').OAuth2Strategy;
 const crypto=require('crypto');
 const User=require('../models/user');
-
+const env=require('./environment');
 
 //tell passport to use a new strategy for google login
 passport.use(new googleStrategy({
         //below info get from console.developers.com =>go to codeial project created
-        clientID:"399691637146-fg31phq30hvpkh9qjijdicb79j59urle.apps.googleusercontent.com",
-        clientSecret:"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",
-        callbackURL:"http://localhost:8000/users/auth/google/callback",
+        clientID:env.google_client_id,
+        clientSecret:env.google_client_secret,
+        callbackURL:env.google_call_back_url,
     },
     function(accessToken,refreshToken,profile,done){
         //find a user
