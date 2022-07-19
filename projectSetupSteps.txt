@@ -3685,7 +3685,7 @@ app.use(sassMiddleware({
     prefix:'/css'
 }))
 
-app.use(express.static(env.asset_path));
+app.use(express.static(__dirname + env.asset_path));
 
 app.use(session({
     name:'goSocial',
@@ -3746,4 +3746,121 @@ data:{
     token:jwt.sign(user.toJSON(),env.jwt_secret,{expiresIn:1000000})
 }
 
-202)
+202)environment.js
+const development={
+    name:'development',
+    asset_path:'/assets',
+    session_cookie_key:'blahsomething',
+    db:'goSocial_development',
+    smtp:{
+        service:'gmail',
+        //go to gmail smtp settings on google
+        //from there get the host for gmail,port:587 is for tls (transport layer secure )
+        host:'smtp.gmail.com',
+        port:587,
+        secure:false,
+        auth:{
+            user:'codeialapplication@gmail.com',
+            //go to this email =>security=>do 2 step verification=>then app password=>then for mail for windows computer=>generate password=>use that password here 
+            pass:'utfmapramalrfgzv'
+        }
+    },
+    google_client_id:"399691637146-fg31phq30hvpkh9qjijdicb79j59urle.apps.googleusercontent.com",
+    google_client_secret:"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",
+    google_call_back_url:"http://localhost:8000/users/auth/google/callback",
+    jwt_secret:'codeial',
+}
+
+//go and save all these in environment variables=>system variables
+//CODEIAL_ENVIRONMENT="production" set in env variables
+const production={
+    name:'production',
+    asset_path:process.env.CODEIAL_ASSET_PATH,
+    //go to random key gen website, choose as per requirement
+    session_cookie_key:process.env.CODEIAL_SESSION_COOKIE_KEY,
+    db:process.env.CODEIAL_DB,
+    smtp:{
+        service:'gmail',
+        //go to gmail smtp settings on google
+        //from there get the host for gmail,port:587 is for tls (transport layer secure )
+        host:'smtp.gmail.com',
+        port:587,
+        secure:false,
+        auth:{
+            user:process.env.CODEIAL_GMAIL_USERNAME,
+            //go to this email =>security=>do 2 step verification=>then app password=>then for mail for windows computer=>generate password=>use that password here 
+            pass:process.env.CODEIAL_GMAIL_PASSWORD,
+        }
+    },
+    google_client_id:process.env.CODEIAL_GOOGLE_CLIENT_ID,
+    google_client_secret:process.env.CODEIAL_GOOGLE_CLIENT_SECRET,
+    google_call_back_url:process.env.CODEIAL_GOOGLE_CALLBACK_URL,
+    jwt_secret:process.env.CODEIAL_JWT_SECRET,
+}
+
+module.exports=eval(process.env.CODEIAL_ENVIRONMENT)==undefined?development:eval(process.env.CODEIAL_ENVIRONMENT);
+
+//set all the variables in environment variables=>system variables
+
+203)package.json
+added prod_start
+
+"scripts": {
+    "start": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prod_start":"NODE_ENV=production nodemon index.js"
+  },
+
+  204)to access NODE_ENV install
+  npm install -g win-node-env
+
+  205)index.js
+  use sass middleware only in development mode
+  if(env.name=='development')
+{
+    app.use(sassMiddleware({
+        src:path.join(__dirname,env.asset_path,'/scss'),
+        dest:path.join(__dirname,env.asset_path,'/css'),
+        debug:true,
+        outputStyle:'extended',
+        prefix:'/css'
+    }));
+}
+
+206)npm install morgan
+npm install rotating-file-stream
+to save logs while production
+
+
+
+207)index.js
+const logger=require('morgan');
+app.use(logger(env.morgan.mode,env.morgan.options));
+
+
+208)environment.js
+const fs=require('fs');
+const rfs=require('rotating-file-stream');
+const path=require('path');
+
+const logDirectory=path.join(__dirname,'../production_logs');
+//if log directory exists then good otherwise create it using file system
+fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
+
+const accessLogStream=rfs.createStream('access.log',{
+    interval:'1d',
+    path:logDirectory,
+});
+
+also in development part
+morgan:{
+    mode:'dev',
+    options:{stream:accessLogStream}
+}
+
+
+and in production part
+morgan:{
+    mode:'combined',
+    options:{stream:accessLogStream}
+}

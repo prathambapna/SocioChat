@@ -1,5 +1,6 @@
 const express=require('express');
 const env=require('./config/environment');
+const logger=require('morgan');
 const cookieParser=require('cookie-parser');
 const app=express();
 const port=8080;
@@ -31,24 +32,29 @@ chatServer.listen(5000);
 console.log('chat server is listening on port 5000');
 
 const path=require('path');
-app.use(sassMiddleware({
-    src:path.join(__dirname,env.asset_path,'/scss'),
-    dest:path.join(__dirname,env.asset_path,'/css'),
-    debug:true,
-    outputStyle:'extended',
-    prefix:'/css'
-}))
 
+if(env.name=='development')
+{
+    app.use(sassMiddleware({
+        src:path.join(__dirname,env.asset_path,'/scss'),
+        dest:path.join(__dirname,env.asset_path,'/css'),
+        debug:true,
+        outputStyle:'extended',
+        prefix:'/css'
+    }));
+}
 
 //used for params and query in post request
 app.use(express.urlencoded());
 
 app.use(cookieParser());
 
-app.use(express.static(env.asset_path));
+app.use(express.static(__dirname + env.asset_path));
 
 //make the uploads path available to the browser
 app.use('/uploads',express.static(__dirname+'/uploads'));
+
+app.use(logger(env.morgan.mode,env.morgan.options));
 
 //use it before using routes as it belongs to view which is going to  be rendered in routes so before it gets rendered we neet to specify layout
 app.use(expressLayouts);
