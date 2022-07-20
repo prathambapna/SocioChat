@@ -3864,3 +3864,57 @@ morgan:{
     mode:'combined',
     options:{stream:accessLogStream}
 }
+
+209)installing gulp
+npm install gulp-cli -g
+npm install gulp -D
+
+210)for sass  compressing(css)
+npm install gulp-sass
+npm install gulp-cssnano
+npm install gulp-rev
+
+211)created public folder
+inside public created assets=>css,images,js
+
+212)gulpfile.js
+const gulp=require('gulp');
+
+//follow below syntax for importing gulp
+const sass = require('gulp-sass')(require('node-sass'));
+const cssnano=require('gulp-cssnano');
+const rev=require('gulp-rev');
+
+//final code for css is this.
+gulp.task('css', (done) => {
+    console.log('Minifying CSS');
+    gulp.src('./assets/sass/**/*.scss')
+    .pipe(sass())
+    .pipe(cssnano())
+    .pipe(gulp.dest('./assets.css'));
+    console.log('Minified CSS');
+    gulp.src('./assets/**/*.css')
+    .pipe(rev())
+    .pipe(gulp.dest('./public/assets'))
+    .pipe(rev.manifest({
+    cwd:'public',
+    merge: true
+})).pipe(
+gulp.dest('./public/assets')
+);
+done();
+})
+
+213)in terminal 
+gulp css
+this will minify css files from assets and store it in public assets css as specified in dest
+
+
+214)for images gulp
+npm install gulp-imagemin@6.0.0
+
+for js
+npm install  gulp-uglify-es
+
+also for all of them together
+npm install del

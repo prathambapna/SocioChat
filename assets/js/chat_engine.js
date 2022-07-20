@@ -25,7 +25,7 @@ class ChatEngine{
                 console.log('a user joined!',data);
             })
         });
-        // CHANGE :: send a message on clicking the send message button
+        // send a message on clicking the send message button
         $('#send-message').click(function(){
             let msg = $('#chat-message-input').val();
 
