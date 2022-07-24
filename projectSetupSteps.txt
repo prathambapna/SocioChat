@@ -4020,7 +4020,7 @@ module.exports=(app)=>{
 217)index.js after defining app
 require('./config/view-helpers')(app);
 
-**********change path in all view files**********
+**********change path in all view files***********
 218)layout.ejs in views
 <link rel="stylesheet" href="<%=assetPath('css/layout.css')%>">
 <link rel="stylesheet" href="<%=assetPath('css/header.css')%>">
