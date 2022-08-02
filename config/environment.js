@@ -31,7 +31,7 @@ const development={
     },
     google_client_id:"399691637146-fg31phq30hvpkh9qjijdicb79j59urle.apps.googleusercontent.com",
     google_client_secret:"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",
-    google_call_back_url:"http://localhost:8000/users/auth/google/callback",
+    google_call_back_url:"http://localhost:8080/users/auth/google/callback",
     jwt_secret:'codeial',
     morgan:{
         mode:'dev',
@@ -69,5 +69,5 @@ const production={
         options:{stream:accessLogStream}
     }
 }
-
+// module.exports=development;
 module.exports=eval(process.env.CODEIAL_ENVIRONMENT)==undefined?development:eval(process.env.CODEIAL_ENVIRONMENT);

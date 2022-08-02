@@ -103,3 +103,39 @@
 ::1 - - [02/Aug/2022:11:23:04 +0000] "POST /likes/toggle/?id=62e908e6fd0048bdf8b77e1d&type=Post HTTP/1.1" 200 58 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
 ::1 - - [02/Aug/2022:11:23:05 +0000] "POST /likes/toggle/?id=62e908b2fd0048bdf8b77de4&type=Post HTTP/1.1" 200 58 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
 ::1 - - [02/Aug/2022:11:23:06 +0000] "POST /likes/toggle/?id=62e908c8fd0048bdf8b77dfb&type=Comment HTTP/1.1" 200 58 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:52:59 +0000] "GET / HTTP/1.1" 200 5573 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:52:59 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:53:02 +0000] "GET /users/sign-in HTTP/1.1" 304 - "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:53:08 +0000] "POST /users/create-session HTTP/1.1" 302 46 "http://localhost:8080/users/sign-in" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:53:08 +0000] "GET / HTTP/1.1" 200 9071 "http://localhost:8080/users/sign-in" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:53:28 +0000] "GET / HTTP/1.1" 200 5573 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:53:35 +0000] "GET /users/sign-in HTTP/1.1" 200 1747 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:53:41 +0000] "POST /users/create-session HTTP/1.1" 302 46 "http://localhost:8080/users/sign-in" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:53:41 +0000] "GET / HTTP/1.1" 200 9072 "http://localhost:8080/users/sign-in" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:53:55 +0000] "POST /likes/toggle/?id=62e90914fd0048bdf8b77e38&type=Post HTTP/1.1" 200 58 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:53:58 +0000] "POST /likes/toggle/?id=62e908e6fd0048bdf8b77e1d&type=Post HTTP/1.1" 200 58 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:54:01 +0000] "POST /likes/toggle/?id=62e908c8fd0048bdf8b77dfb&type=Comment HTTP/1.1" 200 58 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:54:02 +0000] "POST /likes/toggle/?id=62e908c8fd0048bdf8b77dfb&type=Comment HTTP/1.1" 200 57 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:54:02 +0000] "POST /likes/toggle/?id=62e908c8fd0048bdf8b77dfb&type=Comment HTTP/1.1" 200 58 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:54:07 +0000] "GET / HTTP/1.1" 200 8865 "http://localhost:8080/users/sign-in" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:54:18 +0000] "GET /users/sign-out HTTP/1.1" 302 46 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:54:18 +0000] "GET / HTTP/1.1" 200 5777 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:54:21 +0000] "GET /users/sign-in HTTP/1.1" 304 - "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:54:22 +0000] "GET /users/auth/google HTTP/1.1" 302 0 "http://localhost:8080/users/sign-in" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:16:54:46 +0000] "GET /users/auth/google HTTP/1.1" 302 0 "http://localhost:8080/users/sign-in" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:17:01:17 +0000] "GET / HTTP/1.1" 200 5573 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:17:01:18 +0000] "GET /favicon.ico HTTP/1.1" 404 150 "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:17:01:20 +0000] "GET /users/sign-in HTTP/1.1" 304 - "http://localhost:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+::1 - - [02/Aug/2022:17:01:22 +0000] "GET /users/auth/google HTTP/1.1" 302 0 "http://localhost:8080/users/sign-in" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
+[0mGET / [32m200[0m 164.795 ms - 5948[0m
+[0mGET /users/sign-in [36m304[0m 8.840 ms - -[0m
+[0mPOST /users/create-session [36m302[0m 20.762 ms - 46[0m
+[0mGET / [32m200[0m 31.235 ms - 9057[0m
+[0mGET /users/sign-out [36m302[0m 12.568 ms - 46[0m
+[0mGET / [32m200[0m 23.944 ms - 6152[0m
+[0mGET /users/sign-in [36m304[0m 6.573 ms - -[0m
+[0mGET /users/auth/google [36m302[0m 4.157 ms - 0[0m
+[0mGET /users/auth/google/callback?code=4%2F0AdQt8qjt3pHd1kD-C0sq1BKcYIDouxc9-hQJK0zvBGRVfsfubNKId4u0S06T2u2ZJCB93Q&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+openid&authuser=0&prompt=consent [36m302[0m 865.825 ms - 46[0m
+[0mGET / [32m200[0m 29.285 ms - 9057[0m
+[0mGET /users/sign-out [36m302[0m 9.846 ms - 46[0m
+[0mGET / [32m200[0m 35.567 ms - 6152[0m

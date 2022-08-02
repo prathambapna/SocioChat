@@ -1,0 +1,124 @@
+1)setup folders->models,views,routes,controllers,config
+
+2)setup express
+express is nodejs framework
+supporst javascript widely used language(easy to learn)
+provides flexibility,efficiency,minimalism,simplicity
+features
+middleware ,routing,etc
+
+3)setup express.Router() over app.get,app.post?
+It's mostly about code organization / maintainability and scoping middleware.
+
+4)index.js in routes
+all routes would be directed from here
+
+5)controller for home page,user_profile
+
+6)route file for users,updated index route
+
+7)set view engine as ejs
+ejs=>embedded js
+It is a simple templating language/engine that lets its user generate HTML with plain javascript.
+
+8)home.ejs and profile.ejs 
+
+9)layout.ejs using express-ejs-layouts
+to prevent duplicate code everytime for each page(example header footer)
+
+10)folder for assets
+css,images,js(static files)
+
+
+/*
+routes and controllers setup done
+there is a main route index.js ,and all other routes are used in index.js
+after reaching the proper route ,the correspondent controller is called
+now controllers renders the view by calling specific view file
+each view file only contains body of that file ,that is the header,footer are managed in diff files which are included in the same
+now we used express-layout template to define the basic template of the file that would be viewed (rendered)
+now layout.ejs
+in this we include header,footer and remove from the other files
+here we include body as variable which would be sent by other view files which would be rendered at that place
+we create layout.css in assets and tells the main file(index.js) to use express.static files from assets
+now we do layout extractScripts and extractStyles , this is done as when the body variable of layout would be coming from 
+differnt file ,the diff file might have css and js , so now it would be placed in body that is in bw layout file
+to make static files to be positioned at proper place we do the same 
+
+*/
+
+
+
+11)starting with database
+installed and setup mongoose as per documentation ,all setups should be done in config
+
+MongoDB offers greater reliability and efficiency, letting you meet your speed and storage demands. Since it's a distributed database, it has high availability, horizontal scaling, and geographic distribution. setups easily with nodejs
+
+12)creating user models in model folder
+setting up schemma for user
+
+13)signin signup pages
+again starting up from routes in user.js then to user controller
+
+form in user_signup/signin in views
+submitting which again back to controller
+here we create user or user session with conditions checked of user already there or not,password==confirm password
+
+
+
+14)authentication 
+passport local authenticates based on two parameters username and password
+now can use passport to authenticate signin process by using passport as middleware to direct to controller from routes
+make checkAuthentication function which let user go to next page if authenticated
+now since after every server refresh the sessions are lost to store the sessions(using express sessions) in database we use connect-mongo 
+If you don't want to use a database for your chat, you should store the messages into a simple hash. But keep in mind,
+if you restart your node application, they will be lost.MongoStore (or RedisStore) allows you to store the Express sessions into MongoDB/Redis
+instead of using the MemoryStore, which is not designed for a production environment.
+
+
+
+15)included sass(npm install  node-sass-middleware)
+writing scss is much more easier than long css
+SCSS : Syntactically Awesome Style Sheet is the superset of CSS. SCSS is the more advanced version of CSS
+
+16)POSTS
+creating schema for post in post models(also linking with user)
+creating post router=>controller,creating form in home.ejs,populating user in posts in post controller
+fetching all posts in home controller and rendering it to home.ejs
+allow to create post only if user is authenticated from routes
+
+17)COMMENTS
+creating schemma for comments in comments model(with attributes having user and post)
+linking post with comments in posts schemma
+add comments section to each post in home page view
+
+creating comment router=>controller,creating form in home.ejs
+populating post with user, comments(user)
+
+18)deleting post
+will be deleting according to action=> /posts/destroy/:id with passport used as middleware in routes
+in params there would be id of post
+if(id of post.user and req.user matches then delete post and associated comments 
+
+similarly deleting comments and also pulling out this comment from post array in post schemma
+
+19)created partials for comments and posts that is included them in another file named as _comment.ejs and _post.ejs ,checkit out
+
+
+20)created profile page
+different view of profile page for self than that of friends
+display profile and update profile(opt with authentication)
+
+21)
+NOW CHANGING ALL CONTROLLER CODES TO ASYNC AWAIT 
+WHEREEVER THERE IS NESTING OF CALLBACKS(CALLBACK HELL) ,IF ONLY ONE CALLBACK THEN NOT NEEDED
+IN CALLBACK THE VARIABLE WE USE IF NEEDED SO GET IT IN LET VARIABLE(POSTS,COMMENT,ETC)
+In synchronous operations tasks are performed one at a time and only when one is completed, the following is unblocked. In other words, you need to wait for a task to finish to move to the next one. In asynchronous operations, on the other hand, you can move to another task before the previous one finishes.
+
+22)using flash library for notifications
+using noty js to beautify our notifiactions
+
+23)
+
+
+

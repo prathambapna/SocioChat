@@ -420,7 +420,7 @@ install cookie-parser and also call for express.urlencoded() before making a pos
 now creating signin and signup page forms ,the action mentioned here would be of type users/create...
 so this action would be managed in user.js routes which would then be controlled in users_controller
 now in user_controller , first require the model user,then there is a function to create =>User.create which creates a new user of type model User
-with information fetching from req.bodyduring this check for some conditions like if user already exists or password ,confirm password matching
+with information fetching from req.body during this check for some conditions like if user already exists or password ,confirm password matching
 and then finally create user and redirect to sign in page(see syntax)
 this was all for manual authentication, now we'll use passport library
 */
@@ -767,6 +767,7 @@ header{
 /*
 included sass(npm install  node-sass-middleware)
 writing scss is much more easier than long css
+SCSS : Syntactically Awesome Style Sheet is the superset of CSS. SCSS is the more advanced version of CSS
 
 const sassMiddleware=require('node-sass-middleware');
 app.use(sassMiddleware({
@@ -1437,7 +1438,7 @@ module.exports.destroy=async function(req,res){
 
 
 /*
-using flash library for notifiactions
+using flash library for notifications
 
 set up the library flash
 used it after session being used
@@ -2606,10 +2607,10 @@ do auth consent screen verification
 then
 back to create credentials
 authorized javascript origin
-http://localhost:8000
+http://localhost:8080
 
 authorized redirect uris
-http://localhost:8000/users/auth/google/callback
+http://localhost:8080/users/auth/google/callback
 
 u get client id and client secret
 
@@ -2631,7 +2632,7 @@ passport.use(new googleStrategy({
         //below info get from console.developers.com =>go to codeial project created
         clientID:"399691637146-fg31phq30hvpkh9qjijdicb79j59urle.apps.googleusercontent.com",
         clientSecret:"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",
-        callbackURL:"http://localhost:8000/users/auth/google/callback",
+        callbackURL:"http://localhost:8080/users/auth/google/callback",
     },
     function(accessToken,refreshToken,profile,done){
         //find a user
@@ -3442,7 +3443,7 @@ class ToggleLike{
 
 186)home.ejs
 <!-- from https://cdnjs.com/libraries/socket.io -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.5.0/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js"></script>
 <script src="/js/chat_engine.js"></script>
 
 187)index.js
