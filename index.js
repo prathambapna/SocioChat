@@ -4,7 +4,7 @@ const logger=require('morgan');
 const cookieParser=require('cookie-parser');
 const app=express();
 
-require('./config/view-helpers')(app);
+// require('./config/view-helpers')(app);
 
 const port=8080;
 const expressLayouts=require('express-ejs-layouts');
