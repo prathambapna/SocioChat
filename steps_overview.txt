@@ -2,7 +2,7 @@
 
 2)setup express
 express is nodejs framework
-supporst javascript widely used language(easy to learn)
+supports javascript widely used language(easy to learn)
 provides flexibility,efficiency,minimalism,simplicity
 features
 middleware ,routing,etc
@@ -148,3 +148,47 @@ router controller views
 29)implemented chat sockets via socket.io
 
 setup  config,js,views
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------
+
+unique feature:mail ,notifications(flash),api
+
+difficulty:implementing likes(explain about likeable part),google auth
+
+feature u can add now:if some post is getting lot of reactions,comments means that post would be of some importance,getting value to the people
+so i will make that post tobe viewed at the top of the page
+
+technologies:expressjs,mongodb,ejs,js,sass,css,ajax
+1)expressjs=>express is nodejs framework
+supports javascript widely used language(easy to learn)
+provides flexibility,efficiency,minimalism,simplicity
+features
+middleware ,routing,etc
+
+2)ajax=>prevent refreshing of page everytime
+
+3)mongodb=>MongoDB offers greater reliability and efficiency, letting you meet your speed and storage demands. Since it's a distributed database, it has high availability, horizontal scaling, and geographic distribution. setups easily with nodejs
+
+
+
+
+perform crud applications
+users can come to this application and post articles,feed
+and when other users come they can give the reactions like like reactions and comments on post
+there is also a profile section where a user can update self's profile and also can visit and see others profile(name,email,profile picture).
+also the posts are displayed in sorted order (that is the latest one is seen at the top).To prevent unauthorized users to post or react to other's post I have added authentication system,jwt authentication local and google authentication.A chatroom is present where all the users can communicate to each other.To make session interactive some beautified flash messages have een added,so that whenever u commnet,signin,post there is a kind of popup.A mail system is there so whenever someone commentson your post you receive a mail. You can delete that comment if it is not liked by you.This feature is great!.So this is the basic structure of my application.

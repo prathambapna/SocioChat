@@ -22,7 +22,7 @@ module.exports.create=async function(req,res){
             //since we would be requiring name and email of user at various places
             //like user.email 
             comment = await comment.populate('user','name email');
-            // commentsMailer.newComment(comment);
+            commentsMailer.newComment(comment);
             // let job=queueMicrotask.create('emails',comment).save(function(err){
             //     if(err)
             //     {

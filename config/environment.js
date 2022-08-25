@@ -24,9 +24,11 @@ const development={
         port:587,
         secure:false,
         auth:{
-            user:'codeialapplication@gmail.com',
+            user:'codeialmailer@gmail.com',
             //go to this email =>security=>do 2 step verification=>then app password=>then for mail for windows computer=>generate password=>use that password here 
-            pass:'utfmapramalrfgzv'
+            pass:'zmwhvipzotrtsjmw'
+            //codeialmailer12@
+            //zmwhvipzotrtsjmw
         }
     },
     google_client_id:"399691637146-fg31phq30hvpkh9qjijdicb79j59urle.apps.googleusercontent.com",
@@ -69,5 +71,5 @@ const production={
         options:{stream:accessLogStream}
     }
 }
-// module.exports=development;
-module.exports=eval(process.env.CODEIAL_ENVIRONMENT)==undefined?development:eval(process.env.CODEIAL_ENVIRONMENT);
+module.exports=development;
+// module.exports=eval(process.env.CODEIAL_ENVIRONMENT)==undefined?development:eval(process.env.CODEIAL_ENVIRONMENT);

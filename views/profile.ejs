@@ -1,11 +1,6 @@
-<!-- whatever u write here will be rendered to body of the layout -->
-<!-- <link rel="stylesheet" href="<%= assetPath('css/user_profile.css') %>"> -->
 <link rel="stylesheet" href="/css/user_profile.css">
 
-<!-- user available bcoz we made res.locals.user=req.user in passport.js -->
-<!-- <p><%= user.name%></p>
-    <p><%= user.email%></p> -->
-    
+
     
 <% if(user.id==profile_user.id){ %>
     <img src="<%=user.avatar%>" alt="<%=user.name%>" width="100" id="profile_pic">
